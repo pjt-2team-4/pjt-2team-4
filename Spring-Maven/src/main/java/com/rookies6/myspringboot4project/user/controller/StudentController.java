@@ -1,7 +1,7 @@
-package com.rookies6.myspringboot4project.controller;
+package com.rookies6.myspringboot4project.user.controller;
 
-import com.rookies6.myspringboot4project.dto.StudentDTO;
-import com.rookies6.myspringboot4project.service.StudentService;
+import com.rookies6.myspringboot4project.user.dto.StudentDTO;
+import com.rookies6.myspringboot4project.user.service.StudentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.List;
 
 // StudentController 클래스
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class StudentController {
 

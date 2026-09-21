@@ -1,12 +1,12 @@
-package com.rookies6.myspringboot4project.dto;
+package com.rookies6.myspringboot4project.user.dto;
 
-import com.rookies6.myspringboot4project.entity.Student;
-import com.rookies6.myspringboot4project.entity.StudentDetail;
+import com.rookies6.myspringboot4project.common.validation.DynamicSize;
+import com.rookies6.myspringboot4project.user.entity.Student;
+import com.rookies6.myspringboot4project.user.entity.StudentDetail;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,12 +20,19 @@ public class StudentDTO {
     public static class Request {
 
         @NotBlank(message = "이름은 필수입니다.")
-        @Size(max = 100, message = "이름은 100자를 초과할 수 없습니다.")
+        @DynamicSize(
+                maxProperty = "student.name.max-length",
+                message = "이름의 최대 길이를 초과했습니다."
+        )
         private String name;
 
         @NotBlank(message = "학번은 필수입니다.")
-        @Size(max = 20, message = "학번은 20자를 초과할 수 없습니다.")
+        @DynamicSize(
+                maxProperty = "student.number.max-length",
+                message = "학번의 최대 길이를 초과했습니다."
+        )
         private String studentNumber;
+
 
         @Valid
         private StudentDetailDTO detailRequest;
@@ -39,19 +46,8 @@ public class StudentDTO {
 
         private Long id;
 
-        @NotBlank(message = "이름은 필수입니다.")
-        @Size(
-                max = 100,
-                message = "이름은 100자를 초과할 수 없습니다."
-        )
         private String name;
 
-        @NotBlank(message = "학번은 필수입니다.")
-        @Size(max = 20, message = "학번은 20자를 초과할 수 없습니다.")
-        @Pattern(
-                regexp = "^[A-Z]{2}\\d{3}$",
-                message = "학번 형식이 올바르지 않습니다."
-        )
         private String studentNumber;
 
         private StudentDetailDTO.Response detail;
@@ -82,12 +78,20 @@ public class StudentDTO {
         private String address;
 
         @NotBlank(message = "전화번호는 필수입니다.")
+        @DynamicSize(
+                maxProperty = "student.phone.max-length",
+                message = "전화번호가 너무 깁니다."
+        )
         @Pattern(
                 regexp = "^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$",
                 message = "전화번호 형식이 올바르지 않습니다."
         )
         private String phoneNumber;
 
+        @DynamicSize(
+                maxProperty = "student.email.max-length",
+                message = "이메일이 너무 깁니다."
+        )
         @Email(message = "이메일 형식이 올바르지 않습니다.")
         private String email;
 
@@ -100,20 +104,17 @@ public class StudentDTO {
         public static class Response {
 
             private Long id;
+
             private String address;
-            @NotBlank(message = "전화번호는 필수입니다.")
-            @Pattern(
-                    regexp = "^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$",
-                    message = "전화번호 형식이 올바르지 않습니다."
-            )
+
             private String phoneNumber;
 
-            @Email(message = "이메일 형식이 올바르지 않습니다.")
             private String email;
 
             private LocalDate dateOfBirth;
 
             public static Response fromEntity(StudentDetail detail) {
+
                 return Response.builder()
                         .id(detail.getId())
                         .address(detail.getAddress())

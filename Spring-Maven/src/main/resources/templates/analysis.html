@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>코드 보안 분석 API</title>
+    <link rel="stylesheet" th:href="@{/css/analysis-style.css}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🛡️ 코드 보안 분석 API</h1>
+            <p>작성한 코드를 AI 기반으로 분석하고 취약점을 확인하세요.</p>
+        </header>
+
+        <!-- 분석 요청 영역 -->
+        <section class="section">
+            <h2 class="section-title">💻 코드 입력</h2>
+            <div class="card form-container">
+                <form id="analyzeForm" onsubmit="executeAnalysis(event)">
+                    <div class="input-group">
+                        <label for="language">언어 선택</label>
+                        <select id="language" name="language" required>
+                            <option value="JAVA">Java</option>
+                            <option value="PYTHON">Python</option>
+                            <option value="JAVASCRIPT">JavaScript</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="code">소스 코드</label>
+                        <textarea id="code" name="code" rows="10" placeholder="분석할 코드를 입력하세요..." required></textarea>
+                    </div>
+                    <button type="submit" class="execute-button post-button" id="analyzeBtn">분석 실행 (POST)</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 분석 결과 영역 -->
+        <section class="section" style="margin-top: 40px;">
+            <h2 class="section-title">📊 분석 결과</h2>
+            <div class="card result-card" id="resultArea">
+                <div id="resultPlaceholder" class="result waiting">
+                    상단의 <strong>[분석 실행]</strong> 버튼을 누르면 이곳에 결과가 표시됩니다.
+                </div>
+                <!-- 결과 렌더링 컨테이너 (숨김 처리됨) -->
+                <div id="resultContent" style="display: none;">
+                    <div class="summary-box">
+                        <p>분석 ID: <span id="resId"></span></p>
+                        <p>총 취약점: <strong id="resTotal" class="text-warning">0</strong>건</p>
+                        <p>위험(HIGH): <strong id="resHigh" class="text-danger">0</strong>건</p>
+                    </div>
+
+                    <h3 style="margin-top:20px; font-size:1.1em;">상세 취약점</h3>
+                    <table class="api-table" style="margin-top:10px;">
+                        <thead>
+                            <tr>
+                                <th width="10%">라인</th>
+                                <th width="15%">유형</th>
+                                <th width="10%">위험도</th>
+                                <th width="65%">설명 및 AI 제안</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vulnTableBody">
+                            <!-- JS를 통해 동적으로 행이 추가됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/analysis-api.js}"></script>
+</body>
+
+</html>

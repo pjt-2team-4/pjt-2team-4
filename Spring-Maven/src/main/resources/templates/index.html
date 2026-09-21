@@ -1,32 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 
 <head>
     <meta charset="UTF-8">
-    <title>학생 목록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 관리 시스템 (메인)</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <h2>학생 목록</h2>
+    <!-- 전역 상단 네비게이션 바 -->
+    <nav class="top-navbar">
+        <div class="nav-left">
+            <h2>🏫 Spring Boot 관리자</h2>
+        </div>
+        <div class="nav-right">
+            <!-- 추가된 링크 버튼들 -->
+            <a th:href="@{/}" class="nav-link">홈</a>
+            <a th:href="@{/list-users}" class="nav-link">전체 조회</a>
+            <a th:href="@{/api-guide}" class="nav-link">API 가이드</a>
+            <a th:href="@{/analysis}" class="nav-link active">코드 보안 분석</a>
+        </div>
+    </nav>
 
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>이름</th>
-            <th>학번</th>
-        </tr>
+    <div class="container">
+        <!-- 기존 메인 화면 컨텐츠 (학생 목록 등) -->
+        <header class="header">
+            <h1>학생 목록</h1>
+            <p>등록된 학생 데이터를 확인하고 관리합니다.</p>
+        </header>
 
-        <tr th:each="student : ${students}">
-            <td th:text="${student.id}"></td>
-            <td th:text="${student.name}"></td>
-            <td th:text="${student.studentNumber}"></td>
-        </tr>
-    </table>
-
-    <p>
-        <a th:href="@{/signup}">학생 등록</a>
-    </p>
+        <!-- 학생 목록 테이블 영역 (Controller에서 받아온 students 데이터 출력) -->
+        <!-- ... 기존 학생 목록 코드 ... -->
+    </div>
 
 </body>
 

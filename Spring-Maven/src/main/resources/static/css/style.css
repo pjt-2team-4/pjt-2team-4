@@ -1,0 +1,423 @@
+/* =========================
+   Base & Reset
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+}
+
+/* =========================
+   Layout & Typography
+========================= */
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 50px auto;
+}
+
+.header {
+    margin-bottom: 35px;
+}
+
+.header h1 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    color: #111827;
+}
+
+.header p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.section {
+    margin-bottom: 35px;
+}
+
+.section-title {
+    margin: 0 0 15px;
+    font-size: 19px;
+    color: #111827;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* =========================
+   Tables (API & Result)
+========================= */
+.api-table,
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.api-table th,
+.result-table th {
+    background: #f9fafb;
+    text-align: left;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.api-table th {
+    padding: 15px 18px;
+    font-size: 13px;
+}
+
+.result-table th {
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.api-table td,
+.result-table td {
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.api-table td {
+    padding: 16px 18px;
+    font-size: 14px;
+}
+
+.result-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.api-table tbody tr:last-child td,
+.result-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.api-table tbody tr:hover,
+.result-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* =========================
+   Badges (Method & Endpoint)
+========================= */
+.method {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.get {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.post {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.put {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.endpoint {
+    font-family: monospace;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* =========================
+   Forms
+========================= */
+.inline-form {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.inline-form input {
+    width: 100px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    font-size: 13px;
+}
+
+.inline-form input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* =========================
+   Buttons
+========================= */
+/* 공통 버튼 스타일 */
+.execute-button,
+.row-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.execute-button {
+    padding: 8px 13px;
+}
+
+.row-button {
+    padding: 6px 10px;
+    margin-right: 4px;
+}
+
+/* 버튼 색상 Variants */
+.get-button {
+    background: #16a34a;
+    color: white;
+}
+
+.get-button:hover {
+    background: #15803d;
+}
+
+.post-button {
+    background: #2563eb;
+    color: white;
+}
+
+.post-button:hover {
+    background: #1d4ed8;
+}
+
+.put-button {
+    background: #d97706;
+    color: white;
+}
+
+.put-button:hover {
+    background: #b45309;
+}
+
+.delete-button {
+    background: #dc2626;
+    color: white;
+}
+
+.delete-button:hover {
+    background: #b91c1c;
+}
+
+/* 테이블 Row 전용 액션 버튼 */
+.action-cell {
+    white-space: nowrap;
+}
+
+.edit-button {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.edit-button:hover {
+    background: #fde68a;
+}
+
+.delete-row-button {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.delete-row-button:hover {
+    background: #fecaca;
+}
+
+/* =========================
+   Results
+========================= */
+.result {
+    min-width: 130px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.result.waiting {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+.result.success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.result.error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.result.client-error {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.result.server-error {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.result.network-error {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.result-status {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.result-detail {
+    margin-top: 6px;
+    padding: 10px;
+    max-width: 300px;
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: normal;
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+/* =========================
+   Info Cards
+========================= */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.info-card {
+    padding: 22px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.info-card h3 {
+    margin: 14px 0 8px;
+    font-size: 16px;
+}
+
+.info-card p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* =========================
+   Mobile
+========================= */
+@media (max-width: 700px) {
+    .container {
+        width: 95%;
+        margin: 30px auto;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .api-table {
+        min-width: 800px;
+    }
+
+    /* 테이블 스크롤을 위해 최소 너비 유지 */
+    .card {
+        overflow-x: auto;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================
+   Top Navigation Bar
+========================= */
+.top-navbar {
+    display: flex;
+    justify-content: space-between;
+    /* 좌측, 우측 끝으로 밀어내기 */
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.nav-left h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #111827;
+}
+
+.nav-right {
+    display: flex;
+    gap: 15px;
+    /* 버튼 사이 간격 */
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: #f3f4f6;
+    color: #2563eb;
+}
+
+/* 현재 위치한 페이지 강조 효과 */
+.nav-link.active {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}

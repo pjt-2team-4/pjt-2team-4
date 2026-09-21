@@ -2,39 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Edit User</title>
+       <meta charset="UTF-8">
+       <title>학생 정보 수정</title>
+
+       <!-- 공통 CSS 연결 -->
+       <link rel="stylesheet" th:href="@{/css/signup.css}">
 </head>
 
 <body>
 
-<h2>Edit User</h2>
+       <div class="container">
+              <div class="header">
+                     <h1>학생 정보 수정</h1>
+                     <p>기존 학생의 기본 정보와 상세 정보를 변경합니다.</p>
+              </div>
 
-<form th:action="@{/edit/{id}(id=${userForm.id})}"
-      th:object="${userForm}"
-      method="post">
+              <div class="card">
+                     <form th:action="@{/edit-user/{id}(id=${studentForm.id})}" th:object="${studentForm}"
+                            method="post">
 
-    <label for="name">Name</label>
-    <input type="text"
-           id="name"
-           th:field="*{name}">
-    <br/>
+                            <!-- 수정 시 ID 유지를 위한 hidden 필드 -->
+                            <input type="hidden" th:field="*{id}">
 
-    <label for="email">Email</label>
-    <input type="text"
-           id="email"
-           th:field="*{email}">
-    <br/>
+                            <!-- 1. 기본 정보 -->
+                            <fieldset>
+                                   <legend>기본 정보</legend>
+                                   <div class="form-group">
+                                          <label for="name">이름</label>
+                                          <input type="text" id="name" th:field="*{name}">
+                                   </div>
+                                   <div class="form-group">
+                                          <label for="studentNumber">학번</label>
+                                          <input type="text" id="studentNumber" th:field="*{studentNumber}">
+                                   </div>
+                            </fieldset>
 
-    <label for="password">Password</label>
-    <input type="password"
-           id="password"
-           th:field="*{password}">
-    <br/>
+                            <!-- 2. 상세 정보 -->
+                            <fieldset>
+                                   <legend>상세 정보</legend>
+                                   <div class="form-group">
+                                          <label for="email">이메일</label>
+                                          <input type="email" id="email" th:field="*{detail.email}">
+                                   </div>
+                                   <div class="form-group">
+                                          <label for="phoneNumber">전화번호</label>
+                                          <input type="text" id="phoneNumber" th:field="*{detail.phoneNumber}">
+                                   </div>
+                                   <div class="form-group">
+                                          <label for="address">주소</label>
+                                          <input type="text" id="address" th:field="*{detail.address}">
+                                   </div>
+                                   <div class="form-group">
+                                          <label for="dateOfBirth">생년월일</label>
+                                          <input type="date" id="dateOfBirth" th:field="*{detail.dateOfBirth}">
+                                   </div>
+                            </fieldset>
 
-    <input type="submit" value="Update User">
+                            <button type="submit" class="execute-button put-button">수정 완료</button>
 
-</form>
+                     </form>
+
+                     <div class="back-link">
+                            <a th:href="@{/}">← 목록으로 돌아가기</a>
+                     </div>
+              </div>
+       </div>
 
 </body>
+
 </html>

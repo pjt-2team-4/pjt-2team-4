@@ -1,6 +1,6 @@
-package com.rookies6.myspringboot4project.repository;
+package com.rookies6.myspringboot4project.user.repository;
 
-import com.rookies6.myspringboot4project.entity.Student;
+import com.rookies6.myspringboot4project.user.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

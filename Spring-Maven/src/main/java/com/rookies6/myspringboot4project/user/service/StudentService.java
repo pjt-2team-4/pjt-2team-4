@@ -1,12 +1,12 @@
-package com.rookies6.myspringboot4project.service;
+package com.rookies6.myspringboot4project.user.service;
 
-import com.rookies6.myspringboot4project.dto.StudentDTO;
-import com.rookies6.myspringboot4project.entity.Student;
-import com.rookies6.myspringboot4project.entity.StudentDetail;
+import com.rookies6.myspringboot4project.user.dto.StudentDTO;
+import com.rookies6.myspringboot4project.user.entity.Student;
+import com.rookies6.myspringboot4project.user.entity.StudentDetail;
 import com.rookies6.myspringboot4project.exception.BusinessException;
 import com.rookies6.myspringboot4project.exception.ErrorCode;
-import com.rookies6.myspringboot4project.repository.StudentDetailRepository;
-import com.rookies6.myspringboot4project.repository.StudentRepository;
+import com.rookies6.myspringboot4project.user.repository.StudentDetailRepository;
+import com.rookies6.myspringboot4project.user.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
