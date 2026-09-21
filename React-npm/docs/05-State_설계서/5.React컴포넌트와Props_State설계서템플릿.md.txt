@@ -1,0 +1,396 @@
+# React 컴포넌트 설계 문서 템플릿 (온라인 도서관 시스템)
+
+## 문서 정보
+| 항목 | 내용 |
+|------|------|
+| **작성자** | [작성자명] |
+| **작성일** | [YYYY-MM-DD] |
+| **버전** | v1.0 |
+| **검토자** | [검토자명] |
+
+---
+
+## 0. 컴포넌트 설계 프로세스 (작성 전 반드시 읽기)
+
+> 컴포넌트 설계는 "화면 → 코드"로 가는 번역 작업입니다.
+> 아래 4단계를 순서대로 따라가면 자연스럽게 컴포넌트 설계서가 완성됩니다.
+
+### STEP 1 — 화면 설계서에서 사각형 그리기
+
+UI 화면설계서의 와이어프레임을 보며 **"반복되거나, 독립적으로 동작하는 덩어리"** 마다 사각형을 그립니다.
+
+```
+분리 기준 3가지:
+① 재사용 가능한가?       → 여러 화면에서 쓰인다면 공통 컴포넌트로
+② 독립적으로 변경되는가?  → 검색창이 바뀌어도 테이블은 그대로여야 한다면 분리
+③ 너무 길지 않은가?      → 한 컴포넌트가 100줄을 넘으면 분리를 고려
+```
+
+**예시 — 도서 목록 화면에서 컴포넌트 추출:**
+```
+┌──────────────────────────────────────────────────┐
+│ [Header 컴포넌트]                                 │  ← 모든 페이지 공통
+├──────────────────────────────────────────────────┤
+│ ┌────────────────────────────────────────────┐   │
+│ │ [BookSearch 컴포넌트]  [CategoryFilter]     │   │  ← 검색/필터 독립
+│ └────────────────────────────────────────────┘   │
+│ ┌────────────────────────────────────────────┐   │
+│ │ [BookDataGrid 컴포넌트]                    │   │  ← 테이블 독립
+│ │  (재고 Badge + 대출 Button 포함)            │   │
+│ └────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────┘
+
++ [LoanDialog 컴포넌트] — 대출 버튼 클릭 시 나타나는 모달
+```
+
+---
+
+### STEP 2 — 컴포넌트 트리(계층 구조) 그리기
+
+사각형을 부모-자식 계층으로 배치합니다.
+**부모 컴포넌트**가 상태를 갖고, **자식 컴포넌트**는 Props를 받아 표시만 합니다.
+
+```
+[작성 규칙]
+- 들여쓰기로 부모-자식 관계 표현
+- 오른쪽에 해당 컴포넌트가 담당하는 역할 한 줄 메모
+- (Props: ...) 로 전달받는 데이터 명시
+- (State: ...) 로 자신이 갖는 상태 명시
+
+BookListPage                     ← 페이지 컴포넌트 (상태 소유자)
+  ├── BookSearch                  ← 검색창 (Props: onSearch)
+  ├── CategoryFilter              ← 카테고리 선택 (Props: value, onChange)
+  ├── BookDataGrid                ← 테이블 (Props: rows, loading, onLoan)
+  │     └── LoanButton            ← 대출 버튼 (Props: book, onClick)
+  └── LoanDialog                  ← 대출 모달 (Props: open, bookId, onConfirm)
+```
+
+---
+
+### STEP 3 — 상태(State) 위치 결정
+
+> **핵심 원칙**: 상태는 그 값을 **필요로 하는 컴포넌트들의 공통 부모**에 둡니다.
+
+```
+판단 질문 3가지:
+
+Q1. 이 상태를 여러 컴포넌트가 공유하는가?
+    → YES: 공통 부모 컴포넌트 또는 Zustand 전역 스토어
+    → NO:  그 컴포넌트 안의 로컬 상태 (useState)
+
+Q2. 새로고침 후에도 유지되어야 하는가?
+    → YES: Zustand + localStorage (persist)
+    → NO:  일반 useState 또는 Zustand (비영속)
+
+Q3. 서버에서 가져오는 데이터인가?
+    → YES: Zustand 스토어의 액션(fetchXxx)으로 관리
+    → NO:  UI 상태 (열림/닫힘, 선택 항목 등)는 로컬 useState
+```
+
+**상태 위치 결정 예시:**
+| 상태 | 위치 결정 | 이유 |
+|------|-----------|------|
+| `keyword` (검색 입력값) | 로컬 `useState` | BookListPage 안에서만 사용 |
+| `isLoanDialogOpen` | 로컬 `useState` | UI 열림/닫힘 → 서버 무관 |
+| `books` (도서 목록) | `bookStore` (Zustand) | 서버 데이터, 여러 컴포넌트 공유 가능 |
+| `token` (JWT) | `authStore` (Zustand) | 앱 전체에서 인증 확인 필요 |
+
+---
+
+### STEP 4 — 문서 작성
+
+STEP 1~3에서 정리한 내용을 아래 섹션 1~7에 채워 넣습니다.
+
+---
+
+## 1. 컴포넌트 개요
+
+### 1.1 컴포넌트명
+**[컴포넌트명]** (예: `BookDataGrid`, `LoanDialog`, `CategoryFilter`)
+
+### 1.2 목적 및 역할
+- **주요 목적**: [이 컴포넌트가 해결하려는 문제나 담당하는 역할]
+- **위치**: `src/[pages 또는 components]/[폴더명]/[컴포넌트명].jsx`
+- **컴포넌트 유형**: [페이지 / 기능 / 공통] 컴포넌트
+
+### 1.3 기능 요구사항
+- [ ] [기능 1: 예) 도서 목록 표시]
+- [ ] [기능 2: 예) 카테고리 필터링]
+- [ ] [기능 3: 예) 대출 신청 버튼 표시]
+- [ ] [기능 4: 예) 로딩/에러 상태 처리]
+
+---
+
+## 2. 컴포넌트 구조 설계
+
+### 2.1 컴포넌트 분류
+| 항목 | 선택 |
+|------|------|
+| **타입** | [ ] 페이지 컴포넌트 [ ] 레이아웃 컴포넌트 [ ] 기능 컴포넌트 [ ] 공통 컴포넌트 |
+| **복잡도** | [ ] 단순 (50줄 이하) [ ] 보통 (50-100줄) [ ] 복합 (100줄 이상) |
+| **상태 관리** | [ ] 로컬 상태만 (useState) [ ] Zustand 연결 [ ] 상태 없음 (순수 표시) |
+
+### 2.2 컴포넌트 트리 (계층 구조)
+
+> STEP 2를 참고하여 작성합니다. 부모-자식 관계와 각 컴포넌트의 역할을 표시하세요.
+
+```
+[PageComponent]                        ← 상태 소유자, API 호출
+  ├── [ChildComponent A]               ← (Props: [받는 값]) [역할 설명]
+  ├── [ChildComponent B]               ← (Props: [받는 값]) [역할 설명]
+  │     └── [GrandChildComponent]      ← (Props: [받는 값]) [역할 설명]
+  └── [ModalComponent]                 ← (Props: open, onConfirm) 모달
+```
+
+**컴포넌트별 책임 요약:**
+| 컴포넌트명 | 파일 위치 | 주요 책임 | 재사용성 |
+|------------|-----------|-----------|----------|
+| `[PageComponent]` | `pages/[Name]/index.jsx` | 상태 관리, 자식 조립 | 낮음 |
+| `[ChildA]` | `pages/[Name]/components/` | [역할] | 보통 |
+| `[ChildB]` | `components/common/` | [역할] | 높음 |
+
+### 2.3 파일 구조
+```
+src/
+├── pages/
+│   └── [PageName]/
+│       ├── index.jsx                  # 메인 페이지 컴포넌트 (상태 소유)
+│       └── components/                # 이 페이지에서만 쓰는 컴포넌트
+│           ├── [FeatureComponent].jsx
+│           └── [AnotherComponent].jsx
+├── components/
+│   ├── layout/
+│   │   └── Header.jsx                 # 공통 헤더
+│   └── common/
+│       └── LoadingSpinner.jsx         # 로딩 표시
+├── store/
+│   ├── bookStore.js                   # 도서 Zustand 스토어
+│   ├── loanStore.js                   # 대출 Zustand 스토어
+│   └── authStore.js                   # 인증 Zustand 스토어
+└── api/
+    ├── bookApi.js                     # 도서 API 함수
+    └── loanApi.js                     # 대출 API 함수
+```
+
+---
+
+## 3. Props 설계
+
+> STEP 4를 참고하여, 부모가 이 컴포넌트에 내려주는 값과 콜백 함수를 모두 작성합니다.
+
+### 3.1 Props 인터페이스
+| Props명 | 타입 | 필수여부 | 기본값 | 설명 |
+|---------|------|----------|--------|------|
+| [data props] | `타입` | 필수 | — | [표시할 데이터 설명] |
+| [callback props] | `(param) => void` | 필수 | — | [언제 호출되는지] |
+| [option props] | `boolean` | 선택 | `false` | [선택적 동작 설명] |
+
+> **도메인 타입 정의 (공통 참조)**
+> ```typescript
+> // Book 타입
+> type Book = {
+>   id: number;         // 도서 고유 ID
+>   isbn: string;       // ISBN 13자리
+>   title: string;      // 도서명
+>   author: string;     // 저자
+>   category: string;   // 카테고리 (소설/IT/역사/과학/기타)
+>   availableCopies: number;  // 대출 가능 권수
+>   totalCopies: number;      // 총 보유 권수
+> }
+>
+> // Loan 타입
+> type Loan = {
+>   id: number;
+>   bookTitle: string;
+>   loanDate: string;   // "yyyy-MM-dd"
+>   dueDate: string;    // "yyyy-MM-dd"
+>   returnDate: string | null;
+>   status: 'REQUESTED' | 'APPROVED' | 'BORROWED' | 'RETURNED' | 'OVERDUE' | 'CANCELLED';
+> }
+> ```
+
+---
+
+## 4. 상태 관리 설계
+
+> STEP 3을 참고하여, 각 상태가 어디에 위치해야 하는지 근거와 함께 작성합니다.
+
+### 4.1 상태 위치 결정 근거
+
+| 상태명 | 위치 선택 | 결정 근거 |
+|--------|-----------|-----------|
+| [state1] | 로컬 `useState` | [왜 로컬인지: 예) 이 컴포넌트 안에서만 사용, UI 열림/닫힘] |
+| [state2] | `bookStore` | [왜 전역인지: 예) 서버 데이터, 여러 컴포넌트에서 공유] |
+| [state3] | `authStore` | [왜 전역인지: 예) 앱 전체 인증 상태] |
+
+### 4.2 로컬 상태 (useState)
+| 상태명 | 타입 | 초기값 | 용도 |
+|--------|------|--------|------|
+| [state1] | `string` | `""` | [용도. 예) 검색 키워드 입력값] |
+| [state2] | `boolean` | `false` | [용도. 예) 모달 열림 여부] |
+| [state3] | `Book \| null` | `null` | [용도. 예) 선택된 도서 정보] |
+
+### 4.3 Zustand 전역 상태
+> 사용하는 스토어에 체크 표시 후, 이 컴포넌트에서 실제로 쓰는 상태/액션만 기재하세요.
+
+**[ ] bookStore 사용**
+| 상태/액션 | 타입 | 이 컴포넌트에서의 용도 |
+|-----------|------|----------------------|
+| `books` | `Book[]` | 테이블 rows에 전달 |
+| `loading` | `boolean` | 로딩 스피너 조건부 렌더링 |
+| `pageNo` | `number` | DataGrid 현재 페이지 |
+| `totalPages` | `number` | 전체 페이지 수 계산 |
+| `fetchBooks(params)` | `function` | 마운트 시, 검색/필터 시 호출 |
+
+**[ ] loanStore 사용**
+| 상태/액션 | 타입 | 이 컴포넌트에서의 용도 |
+|-----------|------|----------------------|
+| `loans` | `Loan[]` | 대출이력 테이블 rows |
+| `loading` | `boolean` | 로딩 스피너 |
+| `fetchMyLoans()` | `function` | 마운트 시 호출 |
+| `createLoan(bookId)` | `function` | 대출 신청 버튼 클릭 시 |
+| `returnBook(loanId)` | `function` | 반납 버튼 클릭 시 |
+
+**[ ] authStore 사용**
+| 상태/액션 | 타입 | 이 컴포넌트에서의 용도 |
+|-----------|------|----------------------|
+| `token` | `string \| null` | 로그인 여부 판단 (null → 로그인 유도) |
+| `email` | `string` | 헤더에 사용자 이름 표시 |
+| `login(email, pw)` | `function` | 로그인 폼 제출 시 |
+| `logout()` | `function` | 로그아웃 버튼 클릭 시 |
+
+---
+
+## 5. API 연동 설계
+
+### 5.1 사용하는 API 목록
+| API 엔드포인트 | 메서드 | 용도 | 호출 시점 | 인증 필요 |
+|----------------|--------|------|-----------|-----------|
+| `/api/books` | `GET` | 도서 목록 조회 | 페이지 진입 / 검색 | 불필요 |
+| `/api/books/:id` | `GET` | 도서 상세 조회 | 도서 선택 시 | 불필요 |
+| `/api/loans` | `POST` | 대출 신청 | 대출 버튼 클릭 | 필요 |
+| `/api/loans/my` | `GET` | 내 대출이력 | /my/loans 진입 | 필요 |
+| `/api/loans/:id/return` | `PATCH` | 반납 신청 | 반납 버튼 클릭 | 필요 |
+
+### 5.2 Request / Response 예시
+```javascript
+// GET /api/books?keyword=클린코드&category=IT&page=0&size=10
+// Response 200
+{
+  "success": true,
+  "data": {
+    "content": [
+      { "id": 1, "title": "클린 코드", "author": "로버트 마틴",
+        "category": "IT", "availableCopies": 2, "totalCopies": 3 }
+    ],
+    "page": { "number": 0, "size": 10, "totalElements": 25, "totalPages": 3 }
+  }
+}
+```
+
+### 5.3 에러 처리 방식
+| HTTP 상태 | 의미 | 처리 방식 |
+|-----------|------|-----------|
+| `400` | 잘못된 요청 (유효성 오류) | 폼 에러 메시지 표시 |
+| `401` | 인증 실패 | 로그인 페이지로 이동 |
+| `403` | 권한 없음 | "접근 권한이 없습니다" 토스트 |
+| `404` | 리소스 없음 | "해당 도서를 찾을 수 없습니다" |
+| `500` | 서버 오류 | "서버 오류. 잠시 후 다시 시도해 주세요" |
+
+---
+
+## 6. 컴포넌트 구현 골격
+
+> 아래 골격의 주석 순서(로컬 상태 → Zustand → useEffect → 핸들러 → 렌더링)를
+> 일관되게 유지하면 코드 가독성이 높아집니다.
+
+```jsx
+// src/[경로]/[ComponentName].jsx
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useBookStore } from '@/store/bookStore';
+import { useAuthStore } from '@/store/authStore';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import [ChildComponent] from './components/[ChildComponent]';
+import { toast } from 'sonner';
+
+export default function [ComponentName]({ [prop1], [prop2] }) {
+
+  // ── 1. 로컬 상태 ─────────────────────────────
+  const [keyword, setKeyword] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // ── 2. Zustand 전역 상태 ─────────────────────
+  const { books, loading, fetchBooks } = useBookStore();
+  const { token } = useAuthStore();
+  const navigate = useNavigate();
+
+  // ── 3. 사이드 이펙트 (데이터 로드) ───────────
+  useEffect(() => {
+    fetchBooks({ keyword: '', category: '전체', page: 0 });
+  }, []);
+
+  // ── 4. 이벤트 핸들러 ─────────────────────────
+  const handleSearch = (kw) => {
+    setKeyword(kw);
+    fetchBooks({ keyword: kw, page: 0 });
+  };
+
+  // ── 5. 조건부 렌더링 (로딩/에러/빈 데이터) ───
+  // if (loading) return <LoadingSpinner />;
+  // if (error)   return <ErrorMessage />;
+
+  // ── 6. 렌더링 ────────────────────────────────
+  return (
+    <div className="container mx-auto py-6 space-y-4">
+      <Input
+        placeholder="도서명 또는 저자명 입력..."
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSearch(keyword)}
+      />
+      {!loading && books.length === 0 && (
+        <p className="text-center text-neutral-500 py-12">
+          검색 결과가 없습니다.
+        </p>
+      )}
+      <[ChildComponent]
+        rows={books}
+        loading={loading}
+        onLoan={(book) => {
+          if (!token) { toast.error('로그인이 필요합니다'); navigate('/login'); return; }
+          setIsDialogOpen(true);
+        }}
+      />
+    </div>
+  );
+}
+```
+
+---
+
+## 7. 성능 최적화 (해당 시 체크)
+
+| 최적화 기법 | 적용 시기 | 사용법 |
+|-------------|-----------|--------|
+| `React.memo` | 부모가 자주 리렌더링되지만 자식 Props는 안 변할 때 | `export default React.memo(Component)` |
+| `useCallback` | 자식에게 함수 Props를 내려줄 때 (불필요한 자식 리렌더링 방지) | `const handler = useCallback(() => {...}, [deps])` |
+| `useMemo` | 배열 필터링·정렬 등 연산 비용이 클 때 | `const filtered = useMemo(() => loans.filter(...), [loans, filter])` |
+| MUI `rowHeight` 고정 | DataGrid에 많은 행(100+)이 있을 때 | `<DataGrid rowHeight={52} />` |
+
+- [ ] `React.memo` 적용
+- [ ] `useCallback` 적용
+- [ ] `useMemo` 적용
+
+---
+
+## 8. 작성 체크리스트
+
+- [ ] STEP 1: 와이어프레임에서 컴포넌트 경계를 사각형으로 그렸는가?
+- [ ] STEP 2: 컴포넌트 트리(부모-자식 계층)가 작성되었는가?
+- [ ] STEP 3: 각 상태가 왜 로컬/전역인지 근거가 있는가?
+- [ ] 모든 Props의 타입, 필수여부, 기본값이 작성되었는가?
+- [ ] 사용하는 API와 호출 시점이 명확한가?
+- [ ] 로딩 / 에러 / 빈 데이터 3가지 상태가 모두 고려되었는가?
