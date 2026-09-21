@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>학생 목록</title>
+</head>
+
+<body>
+
+    <h2>학생 목록</h2>
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>이름</th>
+            <th>학번</th>
+        </tr>
+
+        <tr th:each="student : ${students}">
+            <td th:text="${student.id}"></td>
+            <td th:text="${student.name}"></td>
+            <td th:text="${student.studentNumber}"></td>
+        </tr>
+    </table>
+
+    <p>
+        <a th:href="@{/signup}">학생 등록</a>
+    </p>
+
+</body>
+
+</html>
