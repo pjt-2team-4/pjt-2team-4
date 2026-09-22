@@ -1,0 +1,139 @@
+/* =========================
+   sidebar.css
+   좌측 세로 네비게이션 전용 스타일
+========================= */
+
+/* 사이드바(250px)가 좌측에 고정되므로, 바디 좌측에 여백 확보 */
+body {
+    margin-left: 250px; 
+    margin-right: 0; /* 우측 여백 초기화 */
+}
+
+/* 좌측 고정 사이드바 */
+.left-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0; /* 우측(right)에서 좌측(left)으로 변경 */
+    width: 250px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05); /* 그림자 방향 오른쪽으로 변경 */
+    border-right: 1px solid #e5e7eb; /* 테두리를 오른쪽으로 변경 */
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 25px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+}
+
+.sidebar-menu {
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+}
+
+.left-sidebar .nav-link {
+    text-decoration: none;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.left-sidebar .nav-link:hover {
+    background-color: #f3f4f6;
+    color: #2563eb;
+}
+
+/* 현재 선택된 메뉴 강조 */
+.left-sidebar .nav-link.active {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+/* 사이드바를 제외한 메인 컨텐츠 영역 */
+.main-content {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* 사이드바 구분선 */
+.sidebar-divider {
+    border: 0;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.15); /* 배경이 어두운 경우 */
+    /* background-color: rgba(0, 0, 0, 0.1); 배경이 밝은 경우 */
+    margin: 20px 15px;
+}
+
+/* 프로젝트 섹션 헤더 (제목 + 더하기 버튼) */
+.sidebar-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8fa0b5; /* 서브 타이틀 색상 */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 새 프로젝트 추가 버튼 (+) */
+.add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8fa0b5;
+    background: transparent;
+    border-radius: 4px;
+    padding: 2px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.add-btn:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 프로젝트 하위 메뉴 여백 및 스타일 조정 */
+.project-menu .sub-link {
+    padding-left: 30px;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+/* 동적 리스트 아이템 앞의 작은 점 디자인 */
+.project-item {
+    display: flex;
+    align-items: center;
+}
+
+.project-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #3498db; /* 프로젝트 강조 색상 */
+    border-radius: 50%;
+    margin-right: 10px;
+    opacity: 0.7;
+}
+
+.project-item:hover .project-dot {
+    opacity: 1;
+    box-shadow: 0 0 5px #3498db;
+}

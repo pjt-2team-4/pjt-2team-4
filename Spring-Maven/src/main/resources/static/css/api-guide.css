@@ -1,317 +1,114 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        "Noto Sans KR",
-        sans-serif;
-
-    background: #f4f6f8;
-
-    color: #1f2937;
-}
+/* api-guide.css */
 
 .container {
-    width: 92%;
-
-    max-width: 1000px;
-
-    margin: 50px auto;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
-
-/* Header */
-
+/* Header 스타일 */
 .header {
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
-    margin-bottom: 40px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
 }
 
 .header h1 {
-    margin: 0 0 8px;
-
-    font-size: 30px;
-
-    color: #111827;
+    margin: 0 0 8px 0;
+    font-size: 24px;
 }
 
 .header p {
     margin: 0;
-
-    color: #6b7280;
-
+    color: #666;
     font-size: 14px;
 }
 
-
-/* Back */
-
 .back-button {
-    padding: 10px 16px;
-
-    background: #374151;
-
-    color: white;
-
-    border-radius: 7px;
-
     text-decoration: none;
-
-    font-size: 13px;
-
-    font-weight: 600;
+    color: #007bff;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 .back-button:hover {
-    background: #111827;
+    text-decoration: underline;
 }
 
-
-/* Section */
-
-.api-section {
-    margin-bottom: 40px;
-}
-
-.section-header {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin-bottom: 15px;
-}
-
-.section-header h2 {
-    margin: 0;
-
-    font-size: 20px;
-}
-
-
-/* API Card */
-
-.api-card {
-    margin-bottom: 15px;
-
-    padding: 24px;
-
-    background: white;
-
-    border-radius: 12px;
-
-    box-shadow:
-        0 4px 15px
-        rgba(0, 0, 0, 0.05);
-}
-
-.api-title {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin-bottom: 18px;
-}
-
-.api-title code {
-    padding: 7px 10px;
-
-    background: #f3f4f6;
-
-    border-radius: 6px;
-
-    color: #374151;
-
-    font-family: monospace;
-
-    font-size: 14px;
-}
-
-.api-card h3 {
-    margin: 0 0 8px;
-
-    font-size: 17px;
-}
-
-.api-card p {
-    margin: 0 0 18px;
-
-    color: #6b7280;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-}
-
-
-/* Method */
-
-.method {
-    display: inline-block;
-
-    padding: 5px 9px;
-
-    border-radius: 5px;
-
-    font-size: 11px;
-
-    font-weight: 700;
-}
-
-.get {
-    background: #dcfce7;
-
-    color: #15803d;
-}
-
-.post {
-    background: #dbeafe;
-
-    color: #1d4ed8;
-}
-
-.put {
-    background: #fef3c7;
-
-    color: #b45309;
-}
-
-.delete {
-    background: #fee2e2;
-
-    color: #dc2626;
-}
-
-
-/* Parameter */
-
-.parameter {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 13px;
-
-    margin-top: 15px;
-
-    background: #f9fafb;
-
-    border-radius: 7px;
-
-    font-size: 13px;
-}
-
-.parameter strong {
-    color: #374151;
-}
-
-.parameter code {
-    padding: 3px 7px;
-
-    background: #e5e7eb;
-
-    border-radius: 4px;
-
-    font-family: monospace;
-}
-
-.parameter span {
-    color: #6b7280;
-}
-
-
-/* Example */
-
-.example {
-    margin-top: 18px;
-}
-
-.example strong {
-    display: block;
-
-    margin-bottom: 8px;
-
-    font-size: 13px;
-}
-
-pre {
-    margin: 0;
-
-    padding: 15px;
-
-    background: #111827;
-
-    color: #e5e7eb;
-
+/* API 카드 허브 스타일 */
+.api-card-hub {
+    background: #ffffff;
+    border: 1px solid #e1e4e8;
     border-radius: 8px;
-
-    overflow-x: auto;
-
-    font-size: 12px;
-
-    line-height: 1.6;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-
-/* Warning */
-
-.warning {
-    margin-top: 18px;
-
-    padding: 13px;
-
-    background: #fff7ed;
-
-    color: #c2410c;
-
-    border-radius: 7px;
-
-    font-size: 13px;
+.api-info h3 {
+    margin: 0 0 8px 0;
+    color: #333;
 }
 
+.api-info p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
 
-/* Mobile */
+/* 엔드포인트 뱃지 스타일 */
+.endpoint-badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
 
-@media (max-width: 700px) {
+.badge {
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+}
 
-    .container {
-        width: 94%;
+.badge.get {
+    background-color: #17a2b8;
+}
 
-        margin: 30px auto;
-    }
+.badge.post {
+    background-color: #28a745;
+}
 
-    .header {
-        align-items: flex-start;
+.badge.put {
+    background-color: #f0ad4e;
+}
 
-        flex-direction: column;
+.badge.delete {
+    background-color: #dc3545;
+}
 
-        gap: 20px;
-    }
+/* 이동 버튼 스타일 */
+.go-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
 
-    .header h1 {
-        font-size: 24px;
-    }
-
-    .parameter {
-        align-items: flex-start;
-
-        flex-direction: column;
-    }
+.go-btn:hover {
+    background-color: #0056b3;
 }

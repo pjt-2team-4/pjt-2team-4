@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>학생 관리 API</title>
+    <title>회원 관리 API</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
@@ -12,8 +12,8 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>🎓 학생 관리 API</h1>
-            <p>StudentController에서 제공하는 API를 확인하고 테스트할 수 있습니다.</p>
+            <h1>👥 회원 관리 API</h1>
+            <p>UserController에서 제공하는 API를 확인하고 테스트할 수 있습니다.</p>
         </header>
 
         <!-- API 목록 -->
@@ -35,10 +35,10 @@
                         <tr>
                             <td><span class="method get">GET</span></td>
                             <td class="endpoint">/api/user</td>
-                            <td>전체 학생 조회</td>
+                            <td>전체 회원 조회</td>
                             <td>
                                 <button type="button" class="execute-button get-button"
-                                    onclick="getAllStudents()">실행</button>
+                                    onclick="getAllUsers()">실행</button>
                             </td>
                             <td>
                                 <span style="color: #666; font-size: 0.9em;">하단 목록 영역에 표시됩니다.</span>
@@ -49,10 +49,10 @@
                         <tr>
                             <td><span class="method get">GET</span></td>
                             <td class="endpoint">/api/user/{id}</td>
-                            <td>ID로 학생 조회</td>
+                            <td>ID로 회원 조회</td>
                             <td>
                                 <form class="inline-form" onsubmit="searchById(event)">
-                                    <input type="number" id="studentId" placeholder="ID" min="1" required>
+                                    <input type="number" id="userId" placeholder="ID" min="1" required>
                                     <button type="submit" class="execute-button get-button">조회</button>
                                 </form>
                             </td>
@@ -61,31 +61,30 @@
                             </td>
                         </tr>
 
-                        <!-- GET 학번 조회 -->
+                        <!-- GET 이메일 조회 (학번 조회 대체) -->
                         <tr>
                             <td><span class="method get">GET</span></td>
-                            <td class="endpoint">/api/user/number/{studentNumber}</td>
-                            <td>학번으로 학생 조회</td>
+                            <td class="endpoint">/api/user/email/{email}</td>
+                            <td>이메일로 회원 조회</td>
                             <td>
-                                <form class="inline-form" onsubmit="searchByStudentNumber(event)">
-                                    <input type="text" id="studentNumber" placeholder="학번" required>
+                                <form class="inline-form" onsubmit="searchByEmail(event)">
+                                    <input type="email" id="userEmail" placeholder="이메일" required>
                                     <button type="submit" class="execute-button get-button">조회</button>
                                 </form>
                             </td>
                             <td>
-                                <div id="result-number" class="result waiting">실행 전</div>
+                                <div id="result-email" class="result waiting">실행 전</div>
                             </td>
                         </tr>
 
-                        <!-- POST 학생 등록 -->
+                        <!-- POST 회원 등록 -->
                         <tr>
                             <td><span class="method post">POST</span></td>
                             <td class="endpoint">/api/user</td>
-                            <td>새로운 학생 등록</td>
+                            <td>새로운 회원 등록</td>
                             <td>
                                 <a th:href="@{/signup}" class="execute-button post-button"
-                                    style="text-decoration: none; text-align: center; display: inline-block;">등록 페이지로
-                                    이동</a>
+                                    style="text-decoration: none; text-align: center; display: inline-block;">등록 페이지로 이동</a>
                             </td>
                             <td>
                                 <span style="color: #666; font-size: 0.9em;">등록 페이지로 이동합니다.</span>
@@ -96,20 +95,20 @@
             </div>
         </section>
 
-        <!-- 전체 학생 목록 결과 영역 (크고 넓게 하단 배치) -->
+        <!-- 전체 회원 목록 결과 영역 -->
         <section class="section" style="margin-top: 40px;">
-            <h2 class="section-title">👨‍🎓 전체 학생 목록</h2>
+            <h2 class="section-title">👥 전체 회원 목록</h2>
             <div class="card" style="padding: 20px;">
                 <div id="result-all" class="result waiting"
                     style="min-height: 150px; display: flex; align-items: center; justify-content: center; font-size: 1.1em; color: #555;">
-                    상단의 <strong>[전체 학생 조회]</strong> 실행 버튼을 누르면 이곳에 결과가 표시됩니다.
+                    상단의 <strong>[실행]</strong> 버튼을 누르면 이곳에 결과가 표시됩니다.
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- JavaScript -->
-    <script th:src="@{/js/student-api.js}"></script>
+    <!-- JavaScript (파일명 변경 적용) -->
+    <script th:src="@{/js/user-api.js}"></script>
 </body>
 
 </html>

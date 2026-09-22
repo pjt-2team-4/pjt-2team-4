@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="getProjectFragment" class="card">
+        <h3>🔍 프로젝트 조회 (GET /api/project)</h3>
+        
+        <!-- 1. 단건 조회 영역 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>프로젝트 ID로 단건 조회</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <input type="number" id="searchId" class="form-control" placeholder="ID 입력 (예: 1)">
+                <button type="button" id="searchBtn" class="btn btn-secondary">조회</button>
+            </div>
+        </div>
+
+        <!-- 2. 전체 조회 영역 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>전체 프로젝트 목록 조회</label>
+            <div style="margin-top: 5px;">
+                <button type="button" id="getAllBtn" class="btn btn-info">전체 목록 가져오기</button>
+            </div>
+        </div>
+
+        <!-- 결과가 출력될 영역 -->
+        <div id="getResultArea" style="margin-top: 15px; display: none;">
+            <h4>📌 조회 결과 (Response)</h4>
+            <pre><code id="getResultJson"></code></pre>
+        </div>
+
+        <!-- 실제 작동을 위한 JavaScript 추가 -->
+        <script>
+            // 1. 단건 조회 버튼 클릭 이벤트
+            document.getElementById('searchBtn').addEventListener('click', async function() {
+                const id = document.getElementById('searchId').value;
+                if (!id) {
+                    alert('조회할 프로젝트 ID를 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/project/${id}`);
+                    if (!response.ok) {
+                        throw new Error('프로젝트를 찾을 수 없습니다. (상태 코드: ' + response.status + ')');
+                    }
+
+                    const result = await response.json();
+                    renderResult(result);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+
+            // 2. 전체 목록 조회 버튼 클릭 이벤트
+            document.getElementById('getAllBtn').addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/project');
+                    if (!response.ok) {
+                        throw new Error('목록을 불러오지 못했습니다. (상태 코드: ' + response.status + ')');
+                    }
+
+                    const result = await response.json();
+                    renderResult(result);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+
+            // 공통 결과 렌더링 함수
+            function renderResult(data) {
+                const resultArea = document.getElementById('getResultArea');
+                const resultJson = document.getElementById('getResultJson');
+                
+                resultJson.textContent = JSON.stringify(data, null, 2);
+                resultArea.style.display = 'block';
+            }
+        </script>
+    </div>
+</body>
+</html>

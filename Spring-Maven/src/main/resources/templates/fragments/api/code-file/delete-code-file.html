@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="deleteCodeFileFragment" class="card">
+        <h3>🗑️ 코드 파일 삭제 (DELETE /api/code-file/{id})</h3>
+        
+        <!-- 삭제 입력 폼 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>삭제할 파일 ID</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <input type="number" id="deleteFileId" class="form-control" placeholder="파일 ID 입력 (예: 1)">
+                <button type="button" id="deleteFileBtn" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">파일 삭제</button>
+            </div>
+        </div>
+
+        <!-- 결과 메시지 출력 영역 -->
+        <div id="codeDeleteResultArea" style="margin-top: 15px; display: none;">
+            <h4>📌 삭제 결과 (Response)</h4>
+            <pre><code id="codeDeleteResultJson"></code></pre>
+        </div>
+
+        <!-- 실제 작동을 위한 JavaScript 추가 -->
+        <script>
+            document.getElementById('deleteFileBtn').addEventListener('click', async function() {
+                const fileId = document.getElementById('deleteFileId').value;
+                if (!fileId) {
+                    alert('삭제할 파일 ID를 입력해주세요.');
+                    return;
+                }
+
+                // 사용자 확인 팝업
+                if (!confirm(`정말로 ID ${fileId} 코드 파일을 삭제하시겠습니까?`)) {
+                    return;
+                }
+
+                try {
+                    // DELETE 요청 전송
+                    const response = await fetch(`/api/code-file/${fileId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('파일 삭제 실패 (상태 코드: ' + response.status + ')');
+                    }
+
+                    // 결과 출력 영역 반영
+                    const resultArea = document.getElementById('codeDeleteResultArea');
+                    const resultJson = document.getElementById('codeDeleteResultJson');
+                    
+                    resultJson.textContent = `ID ${fileId} 코드 파일이 성공적으로 삭제되었습니다. (Status: 200 OK)`;
+                    resultArea.style.display = 'block';
+
+                    alert(`ID ${fileId} 코드 파일이 삭제되었습니다.`);
+                    
+                    // 입력창 초기화
+                    document.getElementById('deleteFileId').value = '';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

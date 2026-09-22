@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="postCodeFileForm" class="card">
+        <h3>📄 코드 파일 생성 (POST /api/code-file)</h3>
+        
+        <!-- 입력 폼 -->
+        <form id="codeFileForm">
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>프로젝트 ID</label>
+                <input type="number" id="codeProjectId" class="form-control" placeholder="예: 1" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>파일 이름</label>
+                <input type="text" id="codeFileName" class="form-control" placeholder="예: UserService.java" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>프로그래밍 언어</label>
+                <input type="text" id="codeLanguage" class="form-control" value="java" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>소스 코드 내용</label>
+                <textarea id="codeSourceCode" class="form-control" rows="5" placeholder="public class UserService { ... }" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">파일 저장</button>
+        </form>
+
+        <!-- 결과가 출력될 영역 -->
+        <div id="codePostResultArea" style="margin-top: 15px; display: none;">
+            <h4>📌 파일 등록 결과 (Response)</h4>
+            <pre><code id="codePostResultJson"></code></pre>
+        </div>
+
+        <!-- 실제 작동을 위한 JavaScript 추가 -->
+        <script>
+            document.getElementById('codeFileForm').addEventListener('submit', async function(e) {
+                e.preventDefault(); // 페이지 새로고침 방지
+
+                // 1. 입력된 값 수집
+                const data = {
+                    projectId: Number(document.getElementById('codeProjectId').value),
+                    fileName: document.getElementById('codeFileName').value,
+                    language: document.getElementById('codeLanguage').value,
+                    sourceCode: document.getElementById('codeSourceCode').value
+                };
+
+                try {
+                    // 2. 백엔드 API로 POST 요청 전송
+                    const response = await fetch('/api/code-file', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('파일 저장 실패 (상태 코드: ' + response.status + ')');
+                    }
+
+                    // 3. 결과 JSON 데이터 받기
+                    const result = await response.json();
+
+                    // 4. 화면에 결과 출력
+                    const resultArea = document.getElementById('codePostResultArea');
+                    const resultJson = document.getElementById('codePostResultJson');
+                    
+                    resultJson.textContent = JSON.stringify(result, null, 2);
+                    resultArea.style.display = 'block';
+
+                    alert('코드 파일이 성공적으로 생성되었습니다! (ID: ' + result.id + ')');
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다: ' + error.message);
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

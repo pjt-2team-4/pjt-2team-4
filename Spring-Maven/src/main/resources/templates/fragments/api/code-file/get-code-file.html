@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="getCodeFileFragment" class="card">
+        <h3>🔍 코드 파일 조회 (GET /api/code-file)</h3>
+        
+        <!-- 1. 프로젝트별 파일 목록 조회 영역 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>프로젝트 ID로 파일 목록 조회</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <input type="number" id="searchProjectId" class="form-control" placeholder="프로젝트 ID 입력 (예: 1)">
+                <button type="button" id="getFilesByProjectBtn" class="btn btn-secondary" style="padding: 6px 12px; border-radius: 4px; cursor: pointer;">목록 조회</button>
+            </div>
+        </div>
+
+        <!-- 2. 파일 단건 상세 조회 영역 -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>파일 ID로 상세 및 소스코드 조회</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <input type="number" id="searchFileId" class="form-control" placeholder="파일 ID 입력 (예: 1)">
+                <button type="button" id="getFileByIdBtn" class="btn btn-info" style="padding: 6px 12px; border-radius: 4px; cursor: pointer;">단건 조회</button>
+            </div>
+        </div>
+
+        <!-- 결과가 출력될 영역 -->
+        <div id="getCodeResultArea" style="margin-top: 15px; display: none;">
+            <h4>📌 파일 조회 결과 (Response)</h4>
+            <pre><code id="getCodeResultJson"></code></pre>
+        </div>
+
+        <!-- 실제 작동을 위한 JavaScript 추가 -->
+        <script>
+            // 1. 프로젝트별 파일 목록 조회 버튼 이벤트
+            document.getElementById('getFilesByProjectBtn').addEventListener('click', async function() {
+                const projectId = document.getElementById('searchProjectId').value;
+                if (!projectId) {
+                    alert('프로젝트 ID를 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/code-file/project/${projectId}`);
+                    if (!response.ok) {
+                        throw new Error('파일 목록을 불러오지 못했습니다. (상태 코드: ' + response.status + ')');
+                    }
+
+                    const result = await response.json();
+                    renderCodeResult(result);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+
+            // 2. 파일 단건 조회 버튼 이벤트
+            document.getElementById('getFileByIdBtn').addEventListener('click', async function() {
+                const fileId = document.getElementById('searchFileId').value;
+                if (!fileId) {
+                    alert('파일 ID를 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/code-file/${fileId}`);
+                    if (!response.ok) {
+                        throw new Error('코드를 찾을 수 없습니다. (상태 코드: ' + response.status + ')');
+                    }
+
+                    const result = await response.json();
+                    renderCodeResult(result);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+
+            // 공통 결과 렌더링 함수
+            function renderCodeResult(data) {
+                const resultArea = document.getElementById('getCodeResultArea');
+                const resultJson = document.getElementById('getCodeResultJson');
+                
+                resultJson.textContent = JSON.stringify(data, null, 2);
+                resultArea.style.display = 'block';
+            }
+        </script>
+    </div>
+</body>
+</html>

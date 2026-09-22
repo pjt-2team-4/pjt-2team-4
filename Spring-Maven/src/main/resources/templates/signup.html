@@ -1,81 +1,63 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 
-<head>
-      <meta charset="UTF-8">
-      <title>학생 등록</title>
-
-      <!-- 공통 CSS 연결 -->
-      <link rel="stylesheet" th:href="@{/css/signup.css}">
+<!-- 공통 Head 조각 불러오기 -->
+<head th:replace="~{fragments/head :: commonHead('회원 등록')}">
 </head>
 
 <body>
+    <!-- 좌측 사이드바 -->
+    <nav class="left-sidebar">
+        <div class="sidebar-header">
+            <h2>🏫 Spring Boot 관리자</h2>
+        </div>
+        <div class="sidebar-menu">
+            <a th:href="@{/}" class="nav-link">홈 (대시보드)</a>
+            <a th:href="@{/list-users}" class="nav-link active">회원 전체 조회</a>
+            <a th:href="@{/api-guide}" class="nav-link">API 가이드</a>
+            <a th:href="@{/analysis}" class="nav-link">코드 보안 분석</a>
+        </div>
+    </nav>
 
-      <div class="container">
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="main-content">
+        <div class="container">
+            <!-- 폼 전용 CSS -->
+            <link rel="stylesheet" th:href="@{/css/signup.css}">
+
             <div class="header">
-                  <h1>학생 등록</h1>
-                  <p>새로운 학생의 기본 정보와 상세 정보를 입력합니다.</p>
+                <h1>회원 등록</h1>
+                <p>새로운 회원의 로그인 정보를 입력합니다.</p>
             </div>
 
             <div class="card">
-                  <form th:action="@{/signup}" th:object="${studentForm}" method="post">
+                <!-- 컨트롤러에서 넘겨준 userForm 객체 사용 -->
+                <form th:action="@{/signup}" th:object="${userForm}" method="post">
 
-                        <!-- 1. 기본 정보 -->
-                        <fieldset>
-                              <legend>기본 정보</legend>
-                              <div class="form-group">
-                                    <label for="name">이름</label>
-                                    <input type="text" id="name" th:field="*{name}" placeholder="이름을 입력하세요">
-                                    <span class="error-msg" th:if="${#fields.hasErrors('name')}"
-                                          th:errors="*{name}"></span>
-                              </div>
-                              <div class="form-group">
-                                    <label for="studentNumber">학번</label>
-                                    <input type="text" id="studentNumber" th:field="*{studentNumber}"
-                                          placeholder="학번을 입력하세요">
-                                    <span class="error-msg" th:if="${#fields.hasErrors('studentNumber')}"
-                                          th:errors="*{studentNumber}"></span>
-                              </div>
-                        </fieldset>
+                    <fieldset>
+                        <legend>접속 정보</legend>
+                        <div class="form-group">
+                            <label for="email">이메일</label>
+                            <input type="email" id="email" th:field="*{email}" placeholder="example@email.com">
+                            <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">비밀번호</label>
+                            <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 입력하세요">
+                            <span class="error-msg" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                        </div>
+                    </fieldset>
 
-                        <!-- 2. 상세 정보 -->
-                        <fieldset>
-                              <legend>상세 정보</legend>
-                              <div class="form-group">
-                                    <label for="email">이메일</label>
-                                    <input type="email" id="email" th:field="*{detailRequest.email}"
-                                          placeholder="example@email.com">
-                                    <span class="error-msg" th:if="${#fields.hasErrors('detailRequest.email')}"
-                                          th:errors="*{detailRequest.email}"></span>
-                              </div>
-                              <div class="form-group">
-                                    <label for="phoneNumber">전화번호</label>
-                                    <input type="text" id="phoneNumber" th:field="*{detailRequest.phoneNumber}"
-                                          placeholder="010-0000-0000">
-                                    <span class="error-msg" th:if="${#fields.hasErrors('detailRequest.phoneNumber')}"
-                                          th:errors="*{detailRequest.phoneNumber}"></span>
-                              </div>
-                              <div class="form-group">
-                                    <label for="address">주소</label>
-                                    <input type="text" id="address" th:field="*{detailRequest.address}"
-                                          placeholder="주소를 입력하세요">
-                              </div>
-                              <div class="form-group">
-                                    <label for="dateOfBirth">생년월일</label>
-                                    <input type="date" id="dateOfBirth" th:field="*{detailRequest.dateOfBirth}">
-                              </div>
-                        </fieldset>
+                    <button type="submit" class="execute-button post-button">등록 완료</button>
 
-                        <button type="submit" class="execute-button post-button">등록 완료</button>
+                </form>
 
-                  </form>
-
-                  <div class="back-link">
-                        <a th:href="@{/}">← 목록으로 돌아가기</a>
-                  </div>
+                <div class="back-link">
+                    <a th:href="@{/list-users}">← 목록으로 돌아가기</a>
+                </div>
             </div>
-      </div>
+        </div>
+    </div>
 
 </body>
-
 </html>

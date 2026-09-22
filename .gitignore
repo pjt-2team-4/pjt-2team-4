@@ -4,10 +4,22 @@
 
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
 .mvn/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+
+# ========================================
+# Java Generics (컴파일 산출물)
+# ========================================
+
+*.class
+*.jar
+*.war
+*.ear
+*.nar
 
 
 # ========================================
@@ -63,19 +75,38 @@ dist/
 
 
 # ========================================
-# Node / React
+# Node / React & Frontend Cache
 # ========================================
 
 node_modules/
+.eslintcache
+coverage/
+.next/
 
 
 # ========================================
-# Environment / Secrets
+# Environment / Secrets & Security
 # ========================================
 
 .env
 .env.*
 !.env.example
+*.jks
+*.p12
+*.key
+*.pem
+*.crt
+
+
+# ========================================
+# Database (Local / Embedded)
+# ========================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.mv.db
+*.h2.db
 
 
 # ========================================

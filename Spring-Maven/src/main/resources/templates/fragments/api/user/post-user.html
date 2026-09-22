@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <section th:fragment="postSection" class="api-section">
+        <div class="section-header">
+            <span class="method post">POST</span>
+            <h2>회원 생성 (회원가입)</h2>
+        </div>
+        
+        <div class="api-card">
+            <div class="api-title">
+                <span class="method post">POST</span>
+                <code>/api/user</code>
+            </div>
+            <h3>새로운 회원 등록</h3>
+            <p>이메일과 비밀번호를 입력하여 새로운 계정을 생성합니다. (이메일 중복 체크 포함)</p>
+            
+            <!-- 실제 입력을 받고 API를 호출하는 폼 -->
+            <form id="createUserForm" style="margin-top: 15px;">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label><strong>이메일 (Email)</strong></label>
+                    <input type="email" id="postUserEmail" class="form-control" placeholder="user@example.com" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label><strong>비밀번호 (Password)</strong></label>
+                    <input type="password" id="postUserPassword" class="form-control" placeholder="비밀번호 입력" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">회원 등록</button>
+            </form>
+
+            <!-- 결과 출력 영역 -->
+            <div id="postResultArea" style="margin-top: 20px; display: none;">
+                <strong>📌 등록 결과 (Response)</strong>
+                <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 5px;"><code id="postResultJson"></code></pre>
+            </div>
+        </div>
+
+        <!-- 실제 작동을 위한 JavaScript Fetch 연동 -->
+        <script>
+            document.getElementById('createUserForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const data = {
+                    email: document.getElementById('postUserEmail').value,
+                    password: document.getElementById('postUserPassword').value
+                };
+
+                try {
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || '회원 등록 실패 (이메일이 중복되었거나 입력값이 잘못되었습니다.)');
+                    }
+
+                    const result = await response.json();
+
+                    // 화면에 결과 출력
+                    const resultArea = document.getElementById('postResultArea');
+                    const resultJson = document.getElementById('postResultJson');
+                    
+                    resultJson.textContent = JSON.stringify(result, null, 2);
+                    resultArea.style.display = 'block';
+
+                    alert(`회원이 성공적으로 등록되었습니다! (ID: ${result.id})`);
+
+                    // 폼 초기화
+                    document.getElementById('postUserEmail').value = '';
+                    document.getElementById('postUserPassword').value = '';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+        </script>
+    </section>
+</body>
+</html>

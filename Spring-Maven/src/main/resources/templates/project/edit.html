@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head th:replace="~{fragments/head :: commonHead('프로젝트 수정')}"></head>
+<body>
+    <!-- (사이드바 코드 생략 - 기존과 동일) -->
+
+    <div class="main-content">
+        <div class="container">
+            <header class="header">
+                <h1>프로젝트 수정</h1>
+                <p>프로젝트의 이름을 변경합니다.</p>
+            </header>
+
+            <section class="section">
+                <div class="card" style="max-width: 500px; margin: 0 auto; padding: 30px;">
+                    <form th:action="@{/projects/{id}/edit(id=${project.id})}" method="post">
+                        <div style="margin-bottom: 20px;">
+                            <label for="name" style="display:block; margin-bottom: 8px; font-weight: bold; color: #555;">프로젝트 이름</label>
+                            <!-- th:value 로 기존 이름을 세팅해 둡니다 -->
+                            <input type="text" id="name" name="name" th:value="${project.name}" required 
+                                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <button type="submit" class="execute-button" style="background-color: #f39c12; color: white;">수정 저장하기</button>
+                        <a th:href="@{/projects}" style="display:block; text-align:center; margin-top:15px; color:#7f8c8d; text-decoration:none;">취소</a>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

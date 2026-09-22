@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<!-- 공통 head 조각 불러오기 -->
+<head th:replace="~{fragments/head :: commonHead('유저 관리 대시보드')}"></head>
+
+<body>
+
+    <!-- 전역 상단 네비게이션 바 -->
+    <nav class="top-navbar">
+        <div class="nav-left">
+            <h2>🏫 Spring Boot 관리자</h2>
+        </div>
+        <div class="nav-right">
+            <a th:href="@{/}" class="nav-link">홈</a>
+            <a th:href="@{/api-guide}" class="nav-link">API 가이드</a>
+            <a th:href="@{/user-management}" class="nav-link active">유저 관리</a>
+            <a th:href="@{/analysis-management}" class="nav-link">코드 보안 분석</a>
+            <a th:href="@{/code-file-management}" class="nav-link">코드 파일 관리</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1200px; margin: 30px auto; padding: 20px;">
+        <header class="header" style="margin-bottom: 30px; text-align: center;">
+            <h1>👤 회원(User) 정보 통합 관리 대시보드</h1>
+            <p>회원 가입, 상세 조회, 정보 수정 및 계정 삭제 기능을 모듈식으로 테스트할 수 있습니다.</p>
+        </header>
+
+        <!-- 2열 그리드 레이아웃 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            
+            <!-- 왼쪽 컬럼: 생성(POST) 및 수정(PUT) -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- 1. 회원 생성 조각 -->
+                <div th:replace="~{fragments/api/user/post-user :: postSection}"></div>
+                
+                <!-- 2. 회원 수정 조각 -->
+                <div th:replace="~{fragments/api/user/put-user :: putSection}"></div>
+            </div>
+            
+            <!-- 오른쪽 컬럼: 조회(GET) 및 삭제(DELETE) -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- 3. 회원 조회 조각 -->
+                <div th:replace="~{fragments/api/user/get-user :: getSection}"></div>
+                
+                <!-- 4. 회원 삭제 조각 -->
+                <div th:replace="~{fragments/api/user/delete-user :: deleteSection}"></div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

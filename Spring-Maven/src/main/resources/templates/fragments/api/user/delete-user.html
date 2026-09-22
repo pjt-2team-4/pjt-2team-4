@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <section th:fragment="deleteSection" class="api-section">
+        <div class="section-header">
+            <span class="method delete">DELETE</span>
+            <h2>회원 삭제</h2>
+        </div>
+        
+        <div class="api-card">
+            <div class="api-title">
+                <span class="method delete">DELETE</span>
+                <code>/api/user/{id}</code>
+            </div>
+            <h3>회원 계정 삭제</h3>
+            <p>특정 ID를 가진 회원의 계정을 삭제합니다. (존재하지 않는 ID인 경우 예외 처리)</p>
+            
+            <!-- 실제 입력을 받고 API를 호출하는 폼 -->
+            <div style="margin-top: 15px;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label><strong>삭제할 회원 ID (Path Variable)</strong></label>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="number" id="deleteUserId" class="form-control" placeholder="ID 입력 (예: 1)" required style="padding: 8px; flex: 1;">
+                        <button type="button" id="deleteUserBtn" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">회원 삭제</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 결과 출력 영역 -->
+            <div id="deleteUserResultArea" style="margin-top: 20px; display: none;">
+                <strong>📌 삭제 결과 (Response)</strong>
+                <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 5px;"><code id="deleteUserResultJson"></code></pre>
+            </div>
+        </div>
+
+        <!-- 실제 작동을 위한 JavaScript Fetch 연동 -->
+        <script>
+            document.getElementById('deleteUserBtn').addEventListener('click', async function() {
+                const id = document.getElementById('deleteUserId').value;
+                if (!id) {
+                    alert('삭제할 회원 ID를 입력해주세요.');
+                    return;
+                }
+
+                if (!confirm(`정말로 ID ${id} 회원을 삭제하시겠습니까?`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/user/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || '회원 삭제 실패 (존재하지 않는 ID이거나 권한이 없습니다.)');
+                    }
+
+                    // 삭제 성공 시 (200 OK, 응답 바디가 비어있을 수 있음)
+                    const resultArea = document.getElementById('deleteUserResultArea');
+                    const resultJson = document.getElementById('deleteUserResultJson');
+                    
+                    resultJson.textContent = `ID ${id} 회원 계정이 성공적으로 삭제되었습니다. (Status: 200 OK)`;
+                    resultArea.style.display = 'block';
+
+                    alert(`ID ${id} 회원이 삭제되었습니다.`);
+                    document.getElementById('deleteUserId').value = '';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                }
+            });
+        </script>
+    </section>
+</body>
+</html>

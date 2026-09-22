@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<!-- 공통 head 조각 불러오기 -->
+<head th:replace="~{fragments/head :: commonHead('코드 보안 분석 대시보드')}"></head>
+
+<body>
+
+    <!-- 전역 상단 네비게이션 바 -->
+    <nav class="top-navbar">
+        <div class="nav-left">
+            <h2>🏫 Spring Boot 관리자</h2>
+        </div>
+        <div class="nav-right">
+            <a th:href="@{/}" class="nav-link">홈</a>
+            <a th:href="@{/list-users}" class="nav-link">전체 조회</a>
+            <a th:href="@{/api-guide}" class="nav-link">API 가이드</a>
+            <a th:href="@{/analysis-management}" class="nav-link active">코드 보안 분석</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1000px; margin: 30px auto; padding: 20px;">
+        <header class="header" style="margin-bottom: 30px; text-align: center;">
+            <h1>🛡️ 코드 보안 분석 대시보드</h1>
+            <p>소스 코드를 입력하여 보안 취약점을 진단하고 결과를 실시간으로 확인합니다.</p>
+        </header>
+
+        <!-- 분석 전용 2분할 레이아웃 (좌: 분석 요청, 우: 결과 단건 조회) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <!-- 왼쪽: 분석 요청 조각 -->
+            <div>
+                <div th:replace="~{fragments/api/analysis/post-analysis :: postAnalysisForm}"></div>
+            </div>
+            
+            <!-- 오른쪽: 분석 결과 조회 조각 -->
+            <div>
+                <div th:replace="~{fragments/api/analysis/get-analysis :: getAnalysisFragment}"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
