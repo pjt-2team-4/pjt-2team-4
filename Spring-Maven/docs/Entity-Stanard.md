@@ -18,9 +18,9 @@
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
-|  | id | BIGINT | PK |
-| 소유 회원 | user_id | BIGINT | FK → users.id, NOT NULL |
-| 프로젝트 제목 | title | VARCHAR(100) | NOT NULL |
+| 프로젝트ID | id | BIGINT | PK |
+| 유저ID | user_id | BIGINT | FK → users.id, NOT NULL |
+| 프로젝트 이름 | title | VARCHAR(100) | NOT NULL |
 | 언어 | language | VARCHAR(20) | NOT NULL |
 | 생성일시 | created_at | DATETIME(6) | NOT NULL |
 | 수정일시 | updated_at | DATETIME(6) | NOT NULL |
@@ -29,51 +29,48 @@
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
-|  | id | BIGINT | PK, NOT NULL |
-| 소속 프로젝트 | project_id | BIGINT | NOT NULL |
-| 전체 경로 (예: src/main/java/UserService.java) | file_path | VARCHAR(500) | NOT NULL |
-| 파일명, 트리 표시용 | file_name | VARCHAR(255) | NOT NULL |
-| 파일 언어 | language | VARCHAR(20) | NOT NULL |
-| 파일 내용 (코드 뷰어에 표시) | content | MEDIUMTEXT | NOT NULL |
-| 업로드 시점 파일 크기 | file_size_bytes | INT | NOT NULL |
-|  | created_at | DATETIME(6) | NOT NULL |
-|  | updated_at | DATETIME(6) | NOT NULL |
-
-#### security_rule (보안 규칙 목록)
-
-| 설명 | 컬럼 | 타입 | 제약 |
-| --- | --- | --- | --- |
-| 보안 규칙 고유ID | id | BIGINT | PK, AUTO_INCREMENT |
-| 규칙 식별 코드 (예: SQL_INJECTION_CONCAT) | rule_code | VARCHAR(50) | NOT NULL, UNIQUE |
-| 취약점 유형(예: SQL_INJECTION) | vulnerability_type | VARCHAR(30) | NOT NULL |
-| 적용 언어 | target_language | VARCHAR(20) | NOT NULL, 기본값 `COMMON` |
-| 규칙 이름 | name | VARCHAR(100) | NOT NULL |
-| 규칙 설명 | description | TEXT | NULL |
-|  | created_at | DATETIME(6) | NOT NULL |
-|  | updated_at | DATETIME(6) | NOT NULL |
+| 파일ID | id | BIGINT | PK, NOT NULL |
+| 프로젝트ID | project_id | BIGINT | FK, NOT NULL |
+| 파일경로 | file_path | VARCHAR(255) | NOT NULL |
+| 파일이름 | file_name | VARCHAR(255) | NOT NULL |
+| 코드 언어 | language | VARCHAR(20) | NOT NULL |
+| 소스 코드 | content | MEDIUMTEXT | NOT NULL |
+| 파일사이즈 | file_size_bytes | INT | NOT NULL |
+| 생성일시 | created_at | DATETIME(6) | NOT NULL |
+| 수정일시 | updated_at | DATETIME(6) | NOT NULL |
 
 #### analysis_request (분석 요청)
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
 | 분석요청 고유ID | id | BIGINT | PK, AUTO_INCREMENT |
-| 요청한 회원 | user_id | BIGINT | FK → users.id, NOT NULL |
-| 소속 프로젝트 | project_id | BIGINT | FK |
-| 입력 코드 언어 | language | VARCHAR(20) | NOT NULL |
-| 사용자 입력 코드 
-(민감정보 마스킹 권장) | source_code | MEDIUMTEXT | NOT NULL |
-| 분석 진행 상태 | status | VARCHAR(20) | NOT NULL, 기본값 `PENDING` |
+| 유저ID | user_id | BIGINT | FK → users.id, NOT NULL |
+| 프로젝트ID | project_id | BIGINT | FK |
+| 코드 언어 | language | VARCHAR(20) | NOT NULL |
+| 소스 코드 | source_code | MEDIUMTEXT | NOT NULL |
 | 예상 소요 시간 | estimated_duration_seconds | INT | NULL |
-| 실패 사유 | error_message | VARCHAR(500) | NULL |
-|  | created_at | DATETIME(6) | NOT NULL |
-|  | updated_at | DATETIME(6) | NOT NULL |
+| 분석요청상태 | status | VARCHAR(20) | NOT NULL, 기본값 `PENDING` |
+| 에러메시지 | error_message | VARCHAR(500) | NULL |
+| 분석 시작시간 | started_at | DATETIME(6) | NULL |
+| 분석 종료시간 | completed_at | DATETIME(6) | NULL |
+| 생성일시 | created_at | DATETIME(6) | NOT NULL |
+| 수정일시 | updated_at | DATETIME(6) | NOT NULL |
 
-#### finding_Vulnerability (탐지된 취약점)
+#### analysis_request_file (분석 요청 파일)
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
-|  | id | BIGINT | PK, AUTO_INCREMENT |
-| 소속 분석 요청 | analysis_request_id | BIGINT | FK → analysis_request.id, NOT NULL |
+| 분석요청 고유ID | analysis_request_id | BIGINT | NOT NULL |
+| 프로젝트ID | project_file_id | BIGINT | NOT NULL |
+
+
+미확정
+#### finding_Vulnerability (탐지된 취약점) 
+
+| 설명 | 컬럼 | 타입 | 제약 |
+| --- | --- | --- | --- |
+| 취약점분석결과ID | id | BIGINT | PK, AUTO_INCREMENT |
+| 분석요청 고유ID | analysis_request_id | BIGINT | FK → analysis_request.id, NOT NULL |
 | 적용된 규칙 | rule_id | BIGINT | FK → security_rule.id, NOT NULL |
 | 심각도(높음/중간/낮음) | severity | VARCHAR(10)	 | NOT NULL |
 | 시작 라인 (1부터) | start_line | INT | NOT NULL |
@@ -81,7 +78,8 @@
 | 문제 코드 조각 (Before) | code_snippet | TEXT | NOT NULL |
 | 생성날짜 | created_at | DATETIME(6) | NOT NULL |
 
-#### LLM 분석 (추후 얘기해봐야함)
+미확정
+#### LLM 분석 (추후 얘기해봐야함) 
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
@@ -99,6 +97,21 @@
 |  | prompt_tokens | INT | NULL |
 |  | completion_tokens | INT | NULL |
 |  | created_at | DATETIME(6) | NOT NULL |
+
+미확정
+#### security_rule (보안 규칙 목록) 
+
+| 설명 | 컬럼 | 타입 | 제약 |
+| --- | --- | --- | --- |
+| 보안 규칙 고유ID | id | BIGINT | PK, AUTO_INCREMENT |
+| 규칙 식별 코드 (예: SQL_INJECTION_CONCAT) | rule_code | VARCHAR(50) | NOT NULL, UNIQUE |
+| 취약점 유형(예: SQL_INJECTION) | vulnerability_type | VARCHAR(30) | NOT NULL |
+| 적용 언어 | target_language | VARCHAR(20) | NOT NULL, 기본값 `COMMON` |
+| 규칙 이름 | name | VARCHAR(100) | NOT NULL |
+| 규칙 설명 | description | TEXT | NULL |
+|  | created_at | DATETIME(6) | NOT NULL |
+|  | updated_at | DATETIME(6) | NOT NULL |
+
 
 ### ✅ Enum 값
 
