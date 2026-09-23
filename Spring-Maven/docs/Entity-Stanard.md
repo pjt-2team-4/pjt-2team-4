@@ -64,8 +64,11 @@
 | 프로젝트ID | project_file_id | BIGINT | NOT NULL |
 
 
-미확정
-#### finding_Vulnerability (탐지된 취약점) 
+
+
+<details>
+<summary><strong> finding_Vulnerability (탐지된 취약점) 미확정 </strong></summary>
+
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
@@ -78,8 +81,11 @@
 | 문제 코드 조각 (Before) | code_snippet | TEXT | NOT NULL |
 | 생성날짜 | created_at | DATETIME(6) | NOT NULL |
 
-미확정
-#### LLM 분석 (추후 얘기해봐야함) 
+</details>
+
+
+<details>
+<summary><strong> LLM 분석 (추후 얘기해봐야함)  미확정 </strong></summary>
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
@@ -98,8 +104,11 @@
 |  | completion_tokens | INT | NULL |
 |  | created_at | DATETIME(6) | NOT NULL |
 
-미확정
-#### security_rule (보안 규칙 목록) 
+</details>
+
+
+<details>
+<summary><strong> security_rule (보안 규칙 목록) 미확정 </strong></summary>
 
 | 설명 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- | --- |
@@ -112,67 +121,26 @@
 |  | created_at | DATETIME(6) | NOT NULL |
 |  | updated_at | DATETIME(6) | NOT NULL |
 
+</details>
+
 
 ### ✅ Enum 값
+
+| 컬럼 | 허용 값 |
+| --- | --- |
+| analysis_request.language | JAVA, JAVASCRIPT |
+| analysis_request.status | PENDING, SCANNING, LLM_ANALYZING, COMPLETED, FAILED |
+
+
+<details>
+<summary><strong> Enum 값 미확정 </strong></summary>
 
 | 컬럼 | 허용 값 |
 | --- | --- |
 | security_rule.vulnerability_type | SQL_INJECTION, HARDCODED_SECRET, XSS, DANGEROUS_FUNCTION, CORS_MISCONFIGURATION, SENSITIVE_DATA_LOGGING, BROKEN_AUTHENTICATION, PLAINTEXT_PASSWORD |
 | security_rule.default_severity, finding.severity | HIGH, MEDIUM, LOW |
 | security_rule.target_language | COMMON, JAVA, JAVASCRIPT |
-| analysis_request.language | JAVA, JAVASCRIPT |
-| analysis_request.status | PENDING, SCANNING, LLM_ANALYZING, COMPLETED, FAILED |
 | llm_analysis.status | COMPLETED, FAILED |
 
-
-# ERD
-
-> 📌 **2026-09-23 기준**
->
-> 도메인 내용이나 실제 스키마는 가장 최근의 확정 사안에 따라 변경될 수 있음.
-
-## 🗂️ Tables
-
-<details open>
-<summary><strong>👤 users — 회원</strong></summary>
-
-| 설명 | 컬럼 | 타입 | 제약 |
-|---|---|---|---|
-| 회원고유ID | `id` | BIGINT | PK, AUTO_INCREMENT |
-| 이메일 | `email` | VARCHAR(100) | NOT NULL, UNIQUE |
-| 해시된 비밀번호 | `password` | VARCHAR(255) | NOT NULL |
-| 생성일시 | `created_at` | DATETIME(6) | NOT NULL |
-| 수정일시 | `updated_at` | DATETIME(6) | NOT NULL |
-
 </details>
 
-<details>
-<summary><strong>📁 project — 프로젝트</strong></summary>
-
-| 설명 | 컬럼 | 타입 | 제약 |
-|---|---|---|---|
-| 프로젝트ID | `id` | BIGINT | PK |
-| 소유 회원 | `user_id` | BIGINT | FK → users.id, NOT NULL |
-| 프로젝트 제목 | `title` | VARCHAR(100) | NOT NULL |
-| 언어 | `language` | VARCHAR(20) | NOT NULL |
-| 생성일시 | `created_at` | DATETIME(6) | NOT NULL |
-| 수정일시 | `updated_at` | DATETIME(6) | NOT NULL |
-
-</details>
-
-<details>
-<summary><strong>📄 project_file — 프로젝트 파일</strong></summary>
-
-| 설명 | 컬럼 | 타입 | 제약 |
-|---|---|---|---|
-| 파일ID | `id` | BIGINT | PK, NOT NULL |
-| 소속 프로젝트 | `project_id` | BIGINT | FK → project.id |
-| 전체 경로 | `file_path` | VARCHAR(500) | NOT NULL |
-| 파일명 | `file_name` | VARCHAR(255) | NOT NULL |
-| 파일 언어 | `language` | VARCHAR(20) | NOT NULL |
-| 파일 내용 | `content` | MEDIUMTEXT | NOT NULL |
-| 파일 크기 | `file_size_bytes` | INT | NOT NULL |
-| 생성일시 | `created_at` | DATETIME(6) | NOT NULL |
-| 수정일시 | `updated_at` | DATETIME(6) | NOT NULL |
-
-</details>
