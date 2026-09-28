@@ -42,7 +42,8 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Project", "id", id));
         
-        project.update(request.getName(), request.getDescription(), request.getLanguage());
+        // description 파라미터 삭제됨
+        project.update(request.getName(), request.getLanguage());
         return ProjectDTO.Response.fromEntity(project);
     }
 

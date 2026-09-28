@@ -4,16 +4,15 @@
     <section th:fragment="postSection" class="api-section">
         <div class="section-header">
             <span class="method post">POST</span>
-            <h2>회원 생성 (회원가입)</h2>
+            <h2 style="color: var(--theme-post);">회원 생성 (회원가입)</h2>
         </div>
         
-        <div class="api-card">
+        <div class="api-card card-post">
             <div class="api-title">
                 <span class="method post">POST</span>
                 <code>/api/user</code>
             </div>
             <h3>새로운 회원 등록</h3>
-            <p>이메일과 비밀번호를 입력하여 새로운 계정을 생성합니다. (이메일 중복 체크 포함)</p>
             
             <form id="createUserForm">
                 <div class="form-group">
@@ -24,10 +23,11 @@
                     <label>비밀번호 (Password)</label>
                     <input type="password" id="postUserPassword" class="form-control" placeholder="비밀번호 입력" required>
                 </div>
-                <button type="submit" class="btn btn-primary">회원 등록</button>
+                <button type="submit" class="btn btn-post">회원 등록</button>
             </form>
 
             <div id="postResultArea" class="result-area">
+                <div class="alert-success" id="postSuccessMsg" style="display:none; background-color: #d4edda; color: #155724;"></div>
                 <strong>📌 등록 결과 (Response)</strong>
                 <pre><code id="postResultJson"></code></pre>
             </div>
@@ -36,35 +36,26 @@
         <script>
             document.getElementById('createUserForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                // (JS 로직은 기존과 100% 동일하므로 생략 없이 유지합니다)
+                const btn = this.querySelector('button');
+                btn.disabled = true;
+                btn.textContent = '등록 중...';
+
                 const data = {
                     email: document.getElementById('postUserEmail').value,
                     password: document.getElementById('postUserPassword').value
                 };
+
                 try {
-                    const response = await fetch('/api/user', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || '회원 등록 실패 (이메일이 중복되었거나 입력값이 잘못되었습니다.)');
-                    }
-                    const result = await response.json();
-                    
-                    const resultArea = document.getElementById('postResultArea');
-                    const resultJson = document.getElementById('postResultJson');
-                    
-                    resultJson.textContent = JSON.stringify(result, null, 2);
-                    resultArea.style.display = 'block';
-                    alert(`회원이 성공적으로 등록되었습니다! (ID: ${result.id})`);
-                    
-                    document.getElementById('postUserEmail').value = '';
-                    document.getElementById('postUserPassword').value = '';
+                    const result = await ApiService.post(API.USER, data);
+                    document.getElementById('postResultJson').textContent = JSON.stringify(result, null, 2);
+                    document.getElementById('postSuccessMsg').textContent = `✅ 가입 성공! (ID: ${result.id})`;
+                    document.getElementById('postSuccessMsg').style.display = 'block';
+                    document.getElementById('postResultArea').style.display = 'block';
                 } catch (error) {
-                    console.error('Error:', error);
                     alert('오류 발생: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '회원 등록';
                 }
             });
         </script>

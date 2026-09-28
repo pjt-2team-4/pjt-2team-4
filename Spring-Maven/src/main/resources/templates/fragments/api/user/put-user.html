@@ -4,34 +4,34 @@
     <section th:fragment="putSection" class="api-section">
         <div class="section-header">
             <span class="method put">PUT</span>
-            <h2>회원 수정</h2>
+            <h2 style="color: var(--theme-put);">회원 수정</h2>
         </div>
         
-        <div class="api-card">
+        <div class="api-card card-put">
             <div class="api-title">
                 <span class="method put">PUT</span>
                 <code>/api/user/{id}</code>
             </div>
             <h3>회원 정보 수정</h3>
-            <p>기존 회원의 이메일 및 비밀번호 정보를 수정합니다.</p>
             
             <form id="updateUserForm">
                 <div class="form-group">
-                    <label>수정할 회원 ID (Path Variable)</label>
-                    <input type="number" id="updateUserId" class="form-control" placeholder="ID 입력 (예: 1)" required>
+                    <label>수정할 회원 ID</label>
+                    <input type="number" id="updateUserId" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label>변경할 이메일</label>
-                    <input type="email" id="updateUserEmail" class="form-control" placeholder="updated@example.com" required>
+                    <input type="email" id="updateUserEmail" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label>변경할 비밀번호</label>
-                    <input type="password" id="updateUserPassword" class="form-control" placeholder="newPassword456!" required>
+                    <input type="password" id="updateUserPassword" class="form-control" required>
                 </div>
-                <button type="submit" class="btn btn-warning">회원 정보 수정</button>
+                <button type="submit" class="btn btn-put">정보 수정</button>
             </form>
 
             <div id="updateResultArea" class="result-area">
+                <div class="alert-success" id="updateSuccessMsg" style="display:none; background-color: #fff3cd; color: #856404;"></div>
                 <strong>📌 수정 결과 (Response)</strong>
                 <pre><code id="updateResultJson"></code></pre>
             </div>
@@ -40,32 +40,27 @@
         <script>
             document.getElementById('updateUserForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                const btn = this.querySelector('button');
                 const id = document.getElementById('updateUserId').value;
+                btn.disabled = true;
+                btn.textContent = '수정 중...';
+
                 const data = {
                     email: document.getElementById('updateUserEmail').value,
                     password: document.getElementById('updateUserPassword').value
                 };
+
                 try {
-                    const response = await fetch(`/api/user/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || '회원 수정 실패 (상태 코드: ' + response.status + ')');
-                    }
-                    const result = await response.json();
-                    
-                    const resultArea = document.getElementById('updateResultArea');
-                    const resultJson = document.getElementById('updateResultJson');
-                    
-                    resultJson.textContent = JSON.stringify(result, null, 2);
-                    resultArea.style.display = 'block';
-                    alert(`ID ${id} 회원 정보가 성공적으로 수정되었습니다!`);
+                    const result = await ApiService.put(`${API.USER}/${id}`, data);
+                    document.getElementById('updateResultJson').textContent = JSON.stringify(result, null, 2);
+                    document.getElementById('updateSuccessMsg').textContent = `✅ 회원 정보가 성공적으로 수정되었습니다.`;
+                    document.getElementById('updateSuccessMsg').style.display = 'block';
+                    document.getElementById('updateResultArea').style.display = 'block';
                 } catch (error) {
-                    console.error('Error:', error);
                     alert('오류 발생: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '정보 수정';
                 }
             });
         </script>

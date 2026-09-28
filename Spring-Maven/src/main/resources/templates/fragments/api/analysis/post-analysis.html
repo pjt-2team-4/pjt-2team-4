@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:fragment="postAnalysisForm" class="card">
-        <h3>🛡️ 코드 보안 분석 요청 (POST /api/analysis)</h3>
+    <div th:fragment="postAnalysisForm" class="api-card card-post">
+        <h3 style="color: var(--theme-post);">🛡️ 코드 보안 분석 요청 (POST)</h3>
         
         <form id="analysisForm">
-            <div class="form-group" style="margin-bottom: 10px;">
-                <label>프로젝트 ID</label>
+            <div class="form-group">
+                <label for="analysisProjectId">프로젝트 ID</label>
                 <input type="number" id="analysisProjectId" class="form-control" placeholder="예: 1" required>
             </div>
-            <div class="form-group" style="margin-bottom: 10px;">
-                <label>프로그래밍 언어</label>
+            <div class="form-group">
+                <label for="analysisLanguage">프로그래밍 언어</label>
                 <input type="text" id="analysisLanguage" class="form-control" value="java" required>
             </div>
-            <div class="form-group" style="margin-bottom: 10px;">
-                <label>소스 코드</label>
-                <textarea id="analysisCode" class="form-control" rows="5" placeholder="String sql = &quot;SELECT * FROM users WHERE id = &quot; + userId;" required></textarea>
+            <div class="form-group">
+                <label for="analysisCode">소스 코드</label>
+                <textarea id="analysisCode" class="form-control" rows="5" placeholder="String sql = ...;" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">분석 실행</button>
+            <!-- 통일된 btn-post 클래스 -->
+            <button type="submit" id="analysisSubmitBtn" class="btn btn-post">분석 실행</button>
         </form>
 
-        <!-- 분석 결과 출력 영역 -->
-        <div id="analysisResultArea" style="margin-top: 20px; display: none;">
+        <div id="analysisResultArea" class="result-area" style="display: none;">
             <h4>📌 분석 결과 대시보드</h4>
-            <div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+            <div class="alert-success" id="analysisSuccessMsg" style="display:none; background-color: #d4edda; color: #155724;"></div>
+            
+            <div class="dashboard-summary">
                 <p><strong>상태:</strong> <span id="resStatus"></span></p>
-                <p><strong>총 취약점 개수:</strong> <span id="resTotalCount"></span>개 (High: <span id="resHighCount" style="color: red;"></span>)</p>
+                <p><strong>총 취약점 개수:</strong> <span id="resTotalCount"></span>개 (High: <span id="resHighCount" class="text-danger"></span>)</p>
             </div>
             <h5>취약점 상세 내역</h5>
             <pre><code id="analysisResultJson"></code></pre>
@@ -34,6 +36,10 @@
         <script>
             document.getElementById('analysisForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
+                const btn = document.getElementById('analysisSubmitBtn');
+                btn.disabled = true;
+                btn.textContent = '분석 진행 중... ⏳';
 
                 const data = {
                     projectId: Number(document.getElementById('analysisProjectId').value),
@@ -42,30 +48,25 @@
                 };
 
                 try {
-                    const response = await fetch('/api/analysis', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
+                    const result = await ApiService.post(API.ANALYSIS, data);
 
-                    if (!response.ok) {
-                        throw new Error('분석 요청 실패 (상태 코드: ' + response.status + ')');
-                    }
-
-                    const result = await response.json();
-
-                    // 화면에 결과 바인딩
                     document.getElementById('resStatus').textContent = result.status;
                     document.getElementById('resTotalCount').textContent = result.totalCount;
                     document.getElementById('resHighCount').textContent = result.highCount;
                     document.getElementById('analysisResultJson').textContent = JSON.stringify(result, null, 2);
+                    
+                    const successMsg = document.getElementById('analysisSuccessMsg');
+                    successMsg.textContent = '✅ 코드 분석이 완료되었습니다!';
+                    successMsg.style.display = 'block';
+                    
                     document.getElementById('analysisResultArea').style.display = 'block';
-
-                    alert('코드 분석이 완료되었습니다!');
 
                 } catch (error) {
                     console.error('Error:', error);
                     alert('오류 발생: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '분석 실행';
                 }
             });
         </script>

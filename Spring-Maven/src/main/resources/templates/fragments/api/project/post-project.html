@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:fragment="postProjectForm" class="card">
-        <h3>🚀 프로젝트 등록 (POST /api/project)</h3>
+    <div th:fragment="postProjectForm" class="api-card card-post">
+        <h3 style="color: var(--theme-post);">🚀 프로젝트 등록 (POST)</h3>
         
-        <!-- 입력 폼 -->
         <form id="projectForm">
             <div class="form-group">
-                <label>프로젝트 이름</label>
-                <input type="text" id="projectName" class="form-control" required>
+                <label for="projectName">프로젝트 이름</label>
+                <input type="text" id="projectName" class="form-control" placeholder="예: 쇼핑몰 결제 시스템" required>
             </div>
             <div class="form-group">
-                <label>설명</label>
-                <input type="text" id="projectDesc" class="form-control">
+                <label for="projectDesc">설명</label>
+                <input type="text" id="projectDesc" class="form-control" placeholder="프로젝트에 대한 간단한 설명">
             </div>
             <div class="form-group">
-                <label>사용 언어</label>
+                <label for="projectLang">사용 언어</label>
                 <input type="text" id="projectLang" class="form-control" value="java" required>
             </div>
-            <button type="submit" class="btn btn-primary">프로젝트 생성</button>
+            <!-- 색상 변수가 적용된 btn-post 클래스 사용 -->
+            <button type="submit" id="submitProjectBtn" class="btn btn-post">프로젝트 생성</button>
         </form>
 
-        <!-- 결과가 출력될 영역 -->
-        <div id="resultArea" style="margin-top: 15px; display: none;">
+        <div id="resultArea" class="result-area" style="display: none;">
+            <div class="alert-success" id="postSuccessMsg" style="display:none; background-color: #d4edda; color: #155724;"></div>
             <h4>📌 등록 결과 (Response)</h4>
             <pre><code id="resultJson"></code></pre>
         </div>
 
-        <!-- 실제 작동을 위한 JavaScript 추가 -->
         <script>
             document.getElementById('projectForm').addEventListener('submit', async function(e) {
-                e.preventDefault(); // 페이지 새로고침 방지
+                e.preventDefault(); 
 
-                // 1. 입력된 값 수집
+                const btn = document.getElementById('submitProjectBtn');
+                btn.disabled = true;
+                btn.textContent = '생성 중... ⏳';
+
                 const data = {
                     name: document.getElementById('projectName').value,
                     description: document.getElementById('projectDesc').value,
@@ -40,34 +42,23 @@
                 };
 
                 try {
-                    // 2. 백엔드 API로 POST 요청 전송
-                    const response = await fetch('/api/project', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    });
+                    const result = await ApiService.post(API.PROJECT, data);
 
-                    if (!response.ok) {
-                        throw new Error('서버 요청 실패: ' + response.status);
-                    }
-
-                    // 3. 결과 JSON 데이터 받기
-                    const result = await response.json();
-
-                    // 4. 화면에 결과 출력
                     const resultArea = document.getElementById('resultArea');
+                    const successMsg = document.getElementById('postSuccessMsg');
                     const resultJson = document.getElementById('resultJson');
                     
+                    successMsg.textContent = `✅ 프로젝트가 성공적으로 등록되었습니다! (ID: ${result.id})`;
+                    successMsg.style.display = 'block';
                     resultJson.textContent = JSON.stringify(result, null, 2);
                     resultArea.style.display = 'block';
-
-                    alert('프로젝트가 성공적으로 등록되었습니다! (ID: ' + result.id + ')');
 
                 } catch (error) {
                     console.error('Error:', error);
                     alert('오류가 발생했습니다: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '프로젝트 생성';
                 }
             });
         </script>

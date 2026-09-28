@@ -56,26 +56,23 @@ public class AnalysisDTO {
         }
     }
 
+    // 새로운 엔티티 스키마에 맞춰 DTO 필드 변경
     @Getter
     public static class VulnerabilityDto {
         private final Long id;
-        private final String type;
+        private final Long ruleId;
         private final String severity;
-        private final int line;
-        private final String problemCode;
-        private final String description;
-        private final String aiExplanation;
-        private final String afterCode;
+        private final Integer startLine;
+        private final Integer endLine;
+        private final String codeSnippet;
 
         public VulnerabilityDto(VulnerabilityFinding finding) {
             this.id = finding.getId();
-            this.type = finding.getType();
+            this.ruleId = finding.getRuleId();
             this.severity = finding.getSeverity();
-            this.line = finding.getLineNumber();
-            this.problemCode = finding.getProblemCode();
-            this.description = finding.getDescription();
-            this.aiExplanation = finding.getAiExplanation();
-            this.afterCode = finding.getAfterCode();
+            this.startLine = finding.getStartLine();
+            this.endLine = finding.getEndLine();
+            this.codeSnippet = finding.getCodeSnippet();
         }
     }
 }

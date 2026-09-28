@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 
-<!-- 공통 head 조각 불러오기 -->
+<!-- 공통 head 조각 불러오기 (여기에 api-config.js, api-service.js가 모두 포함되어 있습니다) -->
 <head th:replace="~{fragments/head :: commonHead('코드 보안 분석 대시보드')}"></head>
 
 <body>
@@ -19,24 +19,28 @@
         </div>
     </nav>
 
-    <div class="container" style="max-width: 1000px; margin: 30px auto; padding: 20px;">
-        <header class="header" style="margin-bottom: 30px; text-align: center;">
+    <!-- 인라인 스타일을 클래스로 분리 (dashboard-container) -->
+    <div class="container dashboard-container">
+        
+        <!-- 중앙 정렬 및 여백 클래스 적용 (text-center) -->
+        <header class="header text-center">
             <h1>🛡️ 코드 보안 분석 대시보드</h1>
             <p>소스 코드를 입력하여 보안 취약점을 진단하고 결과를 실시간으로 확인합니다.</p>
         </header>
 
-        <!-- 분석 전용 2분할 레이아웃 (좌: 분석 요청, 우: 결과 단건 조회) -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- 2분할 레이아웃 적용 (grid-layout) -->
+        <div class="grid-layout">
             <!-- 왼쪽: 분석 요청 조각 -->
-            <div>
+            <div class="grid-item">
                 <div th:replace="~{fragments/api/analysis/post-analysis :: postAnalysisForm}"></div>
             </div>
             
             <!-- 오른쪽: 분석 결과 조회 조각 -->
-            <div>
+            <div class="grid-item">
                 <div th:replace="~{fragments/api/analysis/get-analysis :: getAnalysisFragment}"></div>
             </div>
         </div>
+        
     </div>
 
 </body>

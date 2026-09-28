@@ -4,55 +4,55 @@
     <section th:fragment="deleteSection" class="api-section">
         <div class="section-header">
             <span class="method delete">DELETE</span>
-            <h2>회원 삭제</h2>
+            <h2 style="color: var(--theme-delete);">회원 삭제</h2>
         </div>
         
-        <div class="api-card">
+        <div class="api-card card-delete">
             <div class="api-title">
                 <span class="method delete">DELETE</span>
                 <code>/api/user/{id}</code>
             </div>
-            <h3>회원 계정 삭제</h3>
-            <p>특정 ID를 가진 회원의 계정을 삭제합니다. (존재하지 않는 ID인 경우 예외 처리)</p>
             
-            <div class="form-group">
-                <label>삭제할 회원 ID (Path Variable)</label>
-                <div class="flex-group">
-                    <input type="number" id="deleteUserId" class="form-control" placeholder="ID 입력 (예: 1)" required>
-                    <button type="button" id="deleteUserBtn" class="btn btn-danger">회원 삭제</button>
+            <form id="deleteUserForm">
+                <div class="form-group">
+                    <label>삭제할 회원 ID</label>
+                    <div class="flex-group">
+                        <input type="number" id="deleteUserId" class="form-control" placeholder="ID 입력" required>
+                        <button type="submit" class="btn btn-delete">회원 삭제</button>
+                    </div>
                 </div>
-            </div>
+            </form>
 
             <div id="deleteUserResultArea" class="result-area">
+                <div class="alert-success" id="deleteSuccessMsg" style="display:none; background-color: #f8d7da; color: #721c24;"></div>
                 <strong>📌 삭제 결과 (Response)</strong>
                 <pre><code id="deleteUserResultJson"></code></pre>
             </div>
         </div>
 
         <script>
-            document.getElementById('deleteUserBtn').addEventListener('click', async function() {
+            document.getElementById('deleteUserForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
                 const id = document.getElementById('deleteUserId').value;
-                if (!id) { alert('삭제할 회원 ID를 입력해주세요.'); return; }
-                if (!confirm(`정말로 ID ${id} 회원을 삭제하시겠습니까?`)) { return; }
+                
+                if (!confirm(`정말로 ID ${id} 회원을 삭제하시겠습니까?`)) return;
+                
+                const btn = this.querySelector('button');
+                btn.disabled = true;
+                btn.textContent = '삭제 중...';
 
                 try {
-                    const response = await fetch(`/api/user/${id}`, { method: 'DELETE' });
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || '회원 삭제 실패 (존재하지 않는 ID이거나 권한이 없습니다.)');
-                    }
-                    
-                    const resultArea = document.getElementById('deleteUserResultArea');
-                    const resultJson = document.getElementById('deleteUserResultJson');
-                    
-                    resultJson.textContent = `ID ${id} 회원 계정이 성공적으로 삭제되었습니다. (Status: 200 OK)`;
-                    resultArea.style.display = 'block';
-                    
-                    alert(`ID ${id} 회원이 삭제되었습니다.`);
+                    const result = await ApiService.delete(`${API.USER}/${id}`);
+                    document.getElementById('deleteUserResultJson').textContent = JSON.stringify(result, null, 2);
+                    document.getElementById('deleteSuccessMsg').textContent = `✅ ID ${id} 회원 계정이 삭제되었습니다.`;
+                    document.getElementById('deleteSuccessMsg').style.display = 'block';
+                    document.getElementById('deleteUserResultArea').style.display = 'block';
                     document.getElementById('deleteUserId').value = '';
                 } catch (error) {
-                    console.error('Error:', error);
                     alert('오류 발생: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '회원 삭제';
                 }
             });
         </script>
