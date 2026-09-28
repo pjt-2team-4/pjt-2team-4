@@ -3,7 +3,9 @@
 <body>
     <div th:fragment="postCodeFileForm" class="api-card card-post">
         <h3 style="color: var(--theme-post);">📄 코드 파일 생성 (POST)</h3>
-        
+        <div class="api-title">
+        <code>${API.CODE_FILE}</code>
+        </div>
         <form id="codeFileForm">
             <div class="form-group">
                 <label for="codeProjectId">프로젝트 ID</label>
@@ -39,11 +41,17 @@
                 btn.disabled = true;
                 btn.textContent = '저장 중... ⏳';
 
+                const fileNameVal = document.getElementById('codeFileName').value;
+                const contentVal = document.getElementById('codeSourceCode').value;
+
+                // 📌 백엔드 ProjectFileDTO.Request 규격에 맞춘 객체 생성
                 const data = {
                     projectId: Number(document.getElementById('codeProjectId').value),
-                    fileName: document.getElementById('codeFileName').value,
+                    filePath: "src/main/java/" + fileNameVal, // 파일 경로 설정
+                    fileName: fileNameVal,
                     language: document.getElementById('codeLanguage').value,
-                    sourceCode: document.getElementById('codeSourceCode').value
+                    content: contentVal,
+                    fileSizeBytes: new Blob([contentVal]).size // 텍스트 바이트 크기 자동 계산
                 };
 
                 try {

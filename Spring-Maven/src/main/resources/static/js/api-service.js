@@ -34,3 +34,11 @@ const ApiService = {
         return text ? JSON.parse(text) : { message: "삭제 성공" };
     }
 };
+const requestData = {
+    projectId: 1,
+    filePath: "src/services/UseService.java", // 파일 경로
+    fileName: "UseService.java",             // 👈 빠져있던 파일 이름 추가!
+    language: "java",
+    content: "seServiseServiseServiseServi",
+    fileSizeBytes: new Blob(["seServiseServiseServiseServi"]).size
+};

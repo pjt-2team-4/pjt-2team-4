@@ -7,12 +7,12 @@
         <form id="projectForm">
             <div class="form-group">
                 <label for="projectName">프로젝트 이름</label>
+                <div class="api-title">
+                <code>${API.PROJECT}/{id}</code>
+                </div>
                 <input type="text" id="projectName" class="form-control" placeholder="예: 쇼핑몰 결제 시스템" required>
             </div>
-            <div class="form-group">
-                <label for="projectDesc">설명</label>
-                <input type="text" id="projectDesc" class="form-control" placeholder="프로젝트에 대한 간단한 설명">
-            </div>
+
             <div class="form-group">
                 <label for="projectLang">사용 언어</label>
                 <input type="text" id="projectLang" class="form-control" value="java" required>
@@ -50,7 +50,7 @@
                     
                     successMsg.textContent = `✅ 프로젝트가 성공적으로 등록되었습니다! (ID: ${result.id})`;
                     successMsg.style.display = 'block';
-                    resultJson.textContent = JSON.stringify(result, null, 2);
+                    resultJson.textContent = JSON.stringify(result, 2);
                     resultArea.style.display = 'block';
 
                 } catch (error) {

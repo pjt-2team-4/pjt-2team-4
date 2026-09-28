@@ -3,7 +3,9 @@
 <body>
     <div th:fragment="postAnalysisForm" class="api-card card-post">
         <h3 style="color: var(--theme-post);">🛡️ 코드 보안 분석 요청 (POST)</h3>
-        
+        <div class="api-title">
+        <code>${API.ANALYSIS}</code>
+        </div>
         <form id="analysisForm">
             <div class="form-group">
                 <label for="analysisProjectId">프로젝트 ID</label>

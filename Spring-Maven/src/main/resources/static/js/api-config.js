@@ -5,7 +5,7 @@ const API = {
     
     // 도메인별 엔드포인트
     PROJECT: '/api/project',
-    CODE_FILE: '/api/code-file',
+    CODE_FILE: '/api/project-file',
     ANALYSIS: '/api/analysis',
     USER: '/api/user'
 };

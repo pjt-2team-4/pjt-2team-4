@@ -49,8 +49,7 @@ body {
     font-weight: 500;
     transition: color 0.3s;
 }
-.nav-right .nav-link:hover, 
-.nav-right .nav-link.active { color: #ffffff; }
+
 
 .dashboard-container {
     max-width: 1200px;

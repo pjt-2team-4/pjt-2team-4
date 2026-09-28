@@ -5,7 +5,8 @@
 <head th:replace="~{fragments/head :: commonHead('유저 관리 대시보드')}"></head>
 
 <body>
-    <!-- 전역 상단 네비게이션 바 -->
+
+<!-- 전역 상단 네비게이션 바 -->
     <nav class="top-navbar">
         <div class="nav-left">
             <h2>🏫 Spring Boot 관리자</h2>
@@ -14,8 +15,9 @@
             <a th:href="@{/}" class="nav-link">홈</a>
             <a th:href="@{/api-guide}" class="nav-link">API 가이드</a>
             <a th:href="@{/user-management}" class="nav-link active">유저 관리</a>
-            <a th:href="@{/analysis-management}" class="nav-link">코드 보안 분석</a>
+            <a th:href="@{/project-management}" class="nav-link">프로젝트 관리</a>
             <a th:href="@{/code-file-management}" class="nav-link">코드 파일 관리</a>
+            <a th:href="@{/analysis-management}" class="nav-link">코드 보안 분석</a>
         </div>
     </nav>
 

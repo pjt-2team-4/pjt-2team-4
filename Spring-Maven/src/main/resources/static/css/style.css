@@ -122,22 +122,18 @@ body {
 
 .get {
     background: #dcfce7;
-    color: #15803d;
 }
 
 .post {
     background: #dbeafe;
-    color: #1d4ed8;
 }
 
 .put {
     background: #fef3c7;
-    color: #b45309;
 }
 
 .delete {
     background: #fee2e2;
-    color: #dc2626;
 }
 
 .endpoint {

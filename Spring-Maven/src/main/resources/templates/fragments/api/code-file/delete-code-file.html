@@ -7,6 +7,9 @@
         <form id="deleteCodeFileForm">
             <div class="form-group">
                 <label for="deleteFileId">삭제할 파일 ID</label>
+                <div class="api-title">
+                <code>${API.CODE_FILE}/{fileId}</code>
+                </div>
                 <div class="input-group">
                     <input type="number" id="deleteFileId" class="form-control" placeholder="파일 ID 입력 (예: 1)" required>
                     <!-- 통일된 btn-delete 클래스 사용 -->

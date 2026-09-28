@@ -3,7 +3,9 @@
 <body>
     <div th:fragment="getAnalysisFragment" class="api-card card-get">
         <h3 style="color: var(--theme-get);">🔍 분석 결과 단건 조회 (GET)</h3>
-        
+        <div class="api-title">
+        <code>${API.ANALYSIS}/{id}</code>
+        </div>
         <form id="getAnalysisForm">
             <div class="form-group">
                 <label for="getAnalysisId">분석 요청 ID</label>

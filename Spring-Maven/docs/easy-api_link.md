@@ -70,13 +70,11 @@
 </details>
 
 <details>
-<summary><strong> 3. CodeFile (프로젝트_파일) </strong></summary>
+<summary><strong> 3. ProjectFile (프로젝트_파일) </strong></summary>
 
 
-[CodeFile.java](https://github.com/pjt-2team-4/pjt-2team-4/blob/BE/Spring-Maven/src/main/java/com/rookies6/myspringboot4project/sec/codefile/entity/CodeFile.java)
+[ProjectFile.java](https://github.com/pjt-2team-4/pjt-2team-4/blob/BE/Spring-Maven/src/main/java/com/rookies6/myspringboot4project/sec/codefile/entity/ProjectFile.java)
 
-
-### CodeFile > project_file 로 변경할 예정
 
 
 ### 3-1. 데이터베이스 테이블 명세 project_file
@@ -98,10 +96,10 @@
 
 | 분류 | 기능 | Method | Endpoint (URI) | 요청 데이터 |
 | --- | --- | --- | --- | --- |
-| **코드 파일** | 생성 | `POST` | `/api/code-file` | `[Body]` 프로젝트 ID, 파일명, 언어, 소스 코드 |
-|  | 목록 조회 | `GET` | `/api/code-file` | `[Query]` projectId |
-|  | 상세 조회 | `GET` | `/api/code-file/{id}` | `[Path]` id |
-|  | 삭제 | `DELETE` | `/api/code-file/{id}` | `[Path]` id |
+| **코드 파일** | 생성 | `POST` | `/api/project-file` | `[Body]` 프로젝트 ID, 파일명, 언어, 소스 코드 |
+|  | 목록 조회 | `GET` | `/api/project-file/project/{projectId}` | `[Query]` projectId |
+|  | 상세 조회 | `GET` | `/api/project-file/{id}` | `[Path]` id |
+|  | 삭제 | `DELETE` | `/api/project-file/{id}` | `[Path]` id |
 
 
 </details>
