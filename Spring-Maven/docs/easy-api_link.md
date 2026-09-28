@@ -1,4 +1,8 @@
 
+>2026-09-28
+>
+>황인찬
+
 #  연결 및 api
 
 
@@ -28,9 +32,7 @@
 | **전체 회원 조회** | ==GET== | `/api/user` | *없음* | 등록된 모든 회원 목록을 조회합니다. |
 | **ID로 회원 조회** | ==GET== | `/api/user/{id}` | **Path:** id (BIGINT) | 특정 ID의 회원 정보를 단건 조회합니다. |
 | **이메일로 회원 조회** | ==GET== | `/api/user/email/{email}` | **Path:** email (VARCHAR) | 특정 이메일을 가진 회원의 정보를 조회합니다. |
-| **회원 정보 수정** | ==PUT== | `/api/user/{id}` | **Path:** id (BIGINT)<br>
-
-<br>**Body:** email, password | 기존 회원의 이메일 및 비밀번호 정보를 수정합니다. |
+| **회원 정보 수정** | ==PUT== | `/api/user/{id}` | **Path:** id (BIGINT)**Body:** email, password | 기존 회원의 이메일 및 비밀번호 정보를 수정합니다. |
 | **회원 삭제** | ==DELETE== | `/api/user/{id}` | **Path:** id (BIGINT) | 특정 회원을 삭제합니다. (존재하지 않을 경우 예외 처리) |
 
 </details>
@@ -72,6 +74,9 @@
 
 
 [CodeFile.java](https://github.com/pjt-2team-4/pjt-2team-4/blob/BE/Spring-Maven/src/main/java/com/rookies6/myspringboot4project/sec/codefile/entity/CodeFile.java)
+
+
+### CodeFile > project_file 로 변경할 예정
 
 
 ### 3-1. 데이터베이스 테이블 명세 project_file
@@ -135,6 +140,9 @@
 
 [VulnerabilityFinding.java](https://github.com/pjt-2team-4/pjt-2team-4/blob/BE/Spring-Maven/src/main/java/com/rookies6/myspringboot4project/sec/analysis/entity/VulnerabilityFinding.java)
 
+
+### 기본 생성일시 , 수정일시 등록 부분 공용
+[BaseEntity.java](https://github.com/pjt-2team-4/pjt-2team-4/blob/BE/Spring-Maven/src/main/java/com/rookies6/myspringboot4project/common/BaseEntity.java)
 
 
 

@@ -1,22 +1,18 @@
-package com.rookies6.myspringboot4project.sec.codefile.entity;
+package com.rookies6.myspringboot4project.sec.projectfile.entity;
 
+import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import com.rookies6.myspringboot4project.sec.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "code_files")
+@Table(name = "project_files")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class CodeFile {
+public class ProjectFile extends BaseEntity { // BaseEntity 상속으로 createdAt, updatedAt 자동 관리
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,30 +23,37 @@ public class CodeFile {
     private Project project;
 
     @Column(nullable = false, length = 255)
+    private String filePath; // 파일 경로 추가
+
+    @Column(nullable = false, length = 255)
     private String fileName;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 20) 
     private String language;
 
     @Lob
-    @Column(nullable = false)
-    private String sourceCode;
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
+    private String content; // sourceCode -> content 로 이름 변경 및 타입 지정
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private Integer fileSizeBytes; // 파일 사이즈 추가
 
     @Builder
-    public CodeFile(Project project, String fileName, String language, String sourceCode) {
+    public ProjectFile(Project project, String filePath, String fileName, String language, String content, Integer fileSizeBytes) {
         this.project = project;
+        this.filePath = filePath;
         this.fileName = fileName;
         this.language = language;
-        this.sourceCode = sourceCode;
+        this.content = content;
+        this.fileSizeBytes = fileSizeBytes;
     }
 
-    public void updateContent(String fileName, String sourceCode, String language) {
+    // 파일 내용 및 정보 수정 메서드
+    public void updateContent(String filePath, String fileName, String content, String language, Integer fileSizeBytes) {
+        this.filePath = filePath;
         this.fileName = fileName;
-        this.sourceCode = sourceCode;
+        this.content = content;
         this.language = language;
+        this.fileSizeBytes = fileSizeBytes;
     }
 }
