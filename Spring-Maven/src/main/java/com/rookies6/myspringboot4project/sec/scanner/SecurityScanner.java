@@ -8,10 +8,13 @@ import com.rookies6.myspringboot4project.sec.scanner.rule.SecurityRule;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -20,6 +23,10 @@ import java.util.regex.Pattern;
  */
 @Component
 public class SecurityScanner {
+
+    private static final String SQLI_STATEMENT_RULE_ID = "SQLI-002";
+    private static final Pattern STATEMENT_DECLARATION = Pattern.compile(
+            "\\bStatement\\s+([a-zA-Z_$][\\w$]*)\\s*(?:=|;)");
 
     /** 테스트 코드는 실제 위험이 아니므로 심각도를 1단계 낮춘다 */
     private static final Pattern TEST_PATH = Pattern.compile(
@@ -43,24 +50,36 @@ public class SecurityScanner {
             return List.of();
         }
 
-        Map<Integer, SecurityRule> hitByLine = collectHits(scanLines, rules);
+        Map<Integer, SecurityRule> hitByLine = collectHits(scanLines, rules, language);
         List<RawFinding> findings = mergeConsecutive(hitByLine, originalLines, relativePath);
         return findings;
     }
 
     // ── 1) 라인별 매칭: 한 라인에 여러 룰이 걸리면 심각도가 높은 1건만 남긴다 ──
-    private Map<Integer, SecurityRule> collectHits(String[] lines, List<SecurityRule> rules) {
+    private Map<Integer, SecurityRule> collectHits(String[] lines, List<SecurityRule> rules,
+                                                   Language language) {
         Map<Integer, SecurityRule> hits = new TreeMap<>();
+        Set<String> statementVariables = new HashSet<>();
 
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if (line.isBlank()) {
                 continue;
             }
+            if (language == Language.JAVA) {
+                Matcher declaration = STATEMENT_DECLARATION.matcher(line);
+                while (declaration.find()) {
+                    statementVariables.add(declaration.group(1));
+                }
+            }
             int lineNumber = i + 1;
 
             for (SecurityRule rule : rules) {
                 if (!rule.matches(line) || rule.isExcluded(line)) {
+                    continue;
+                }
+                if (SQLI_STATEMENT_RULE_ID.equals(rule.getRuleId())
+                        && !matchesDeclaredStatement(rule, line, statementVariables)) {
                     continue;
                 }
                 SecurityRule previous = hits.get(lineNumber);
@@ -71,6 +90,17 @@ public class SecurityScanner {
             }
         }
         return hits;
+    }
+
+    private boolean matchesDeclaredStatement(SecurityRule rule, String line,
+                                             Set<String> statementVariables) {
+        Matcher execution = rule.getPattern().matcher(line);
+        while (execution.find()) {
+            if (statementVariables.contains(execution.group(1))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ── 2) 같은 룰이 연속된 라인에서 걸리면 하나의 구간으로 병합 ──
