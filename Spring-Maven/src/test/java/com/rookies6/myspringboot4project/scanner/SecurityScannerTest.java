@@ -130,6 +130,35 @@ class SecurityScannerTest {
     }
 
     @Test
+    @DisplayName("Statement 선언과 executeQuery 호출이 다른 줄이어도 SQL Injection을 탐지한다")
+    void shouldDetectStatementQueryAcrossLines() {
+        String code = """
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
+                """;
+
+        List<RawFinding> findings = scanner.scan("src/Database.java", Language.JAVA, code);
+
+        assertThat(findings).hasSize(1);
+        assertThat(findings.get(0).ruleId()).isEqualTo("SQLI-002");
+        assertThat(findings.get(0).startLine()).isEqualTo(2);
+        assertThat(findings.get(0).endLine()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Statement가 아닌 객체의 executeQuery 호출은 SQLI-002로 탐지하지 않는다")
+    void shouldNotTreatOtherObjectAsStatement() {
+        String code = """
+                CustomQuery query = new CustomQuery();
+                query.executeQuery(sql);
+                """;
+
+        List<RawFinding> findings = scanner.scan("src/Database.java", Language.JAVA, code);
+
+        assertThat(findings).isEmpty();
+    }
+
+    @Test
     @DisplayName("같은 룰이 연속된 라인에 걸리면 하나로 병합된다")
     void shouldMergeConsecutiveLines() {
         String code = """
