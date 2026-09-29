@@ -1,14 +1,14 @@
 package com.rookies6.myspringboot4project.auth.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
-public class User {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,5 +17,11 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String pasword;
+    private String password;
+
+    @Builder
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }

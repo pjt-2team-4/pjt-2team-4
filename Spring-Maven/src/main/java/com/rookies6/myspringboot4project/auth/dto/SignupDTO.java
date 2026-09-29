@@ -1,7 +1,6 @@
 package com.rookies6.myspringboot4project.auth.dto;
 
-import com.rookies6.myspringboot4project.user.dto.UserDTO;
-import com.rookies6.myspringboot4project.user.entity.User;
+import com.rookies6.myspringboot4project.auth.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -41,8 +40,8 @@ public class SignupDTO {
         private String email;
         // 보안상 password는 응답에 포함하지 않음
 
-        public static UserDTO.Response fromEntity(User user) {
-            return UserDTO.Response.builder()
+        public static SignupDTO.Response fromEntity(User user) {
+            return SignupDTO.Response.builder()
                     .id(user.getId())
                     .email(user.getEmail())
                     .build();
