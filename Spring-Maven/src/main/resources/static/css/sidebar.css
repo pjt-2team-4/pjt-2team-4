@@ -3,22 +3,16 @@
    좌측 세로 네비게이션 전용 스타일
 ========================= */
 
-/* 사이드바(250px)가 좌측에 고정되므로, 바디 좌측에 여백 확보 */
-body {
-    margin-left: 250px; 
-    margin-right: 0; /* 우측 여백 초기화 */
-}
-
 /* 좌측 고정 사이드바 */
 .left-sidebar {
     position: fixed;
     top: 0;
-    left: 0; /* 우측(right)에서 좌측(left)으로 변경 */
+    left: 0;
     width: 250px;
     height: 100vh;
     background-color: #ffffff;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05); /* 그림자 방향 오른쪽으로 변경 */
-    border-right: 1px solid #e5e7eb; /* 테두리를 오른쪽으로 변경 */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    border-right: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
     z-index: 1000;
@@ -42,6 +36,7 @@ body {
     gap: 8px; 
 }
 
+/* 기본 메뉴 링크 스타일 */
 .left-sidebar .nav-link {
     text-decoration: none;
     color: #4b5563;
@@ -63,19 +58,11 @@ body {
     color: #1d4ed8;
 }
 
-/* 사이드바를 제외한 메인 컨텐츠 영역 */
-.main-content {
-    width: 100%;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-/* 사이드바 구분선 */
+/* 사이드바 구분선 (밝은 테마) */
 .sidebar-divider {
     border: 0;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.15); /* 배경이 어두운 경우 */
-    /* background-color: rgba(0, 0, 0, 0.1); 배경이 밝은 경우 */
+    background-color: #e5e7eb;
     margin: 20px 15px;
 }
 
@@ -88,17 +75,17 @@ body {
     margin-bottom: 10px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #8fa0b5; /* 서브 타이틀 색상 */
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-/* 새 프로젝트 추가 버튼 (+) */
+/* 새 프로젝트 추가 버튼 (+) - 밝은 테마에 맞게 Hover 수정 */
 .add-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8fa0b5;
+    color: #6b7280;
     background: transparent;
     border-radius: 4px;
     padding: 2px;
@@ -107,33 +94,50 @@ body {
 }
 
 .add-btn:hover {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.1);
+    color: #1d4ed8;
+    background-color: #eff6ff;
 }
 
-/* 프로젝트 하위 메뉴 여백 및 스타일 조정 */
+/* 프로젝트 하위 메뉴 여백 조정 */
 .project-menu .sub-link {
     padding-left: 30px;
     font-size: 0.95rem;
-    opacity: 0.9;
 }
 
-/* 동적 리스트 아이템 앞의 작은 점 디자인 */
+/* =========================
+   Sidebar Project Items
+========================= */
 .project-item {
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
 .project-dot {
     width: 6px;
     height: 6px;
-    background-color: #3498db; /* 프로젝트 강조 색상 */
+    background-color: #9ca3af;
     border-radius: 50%;
-    margin-right: 10px;
-    opacity: 0.7;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
-.project-item:hover .project-dot {
-    opacity: 1;
-    box-shadow: 0 0 5px #3498db;
+/* Hover 및 Active 상태 시 포인트 컬러(파란색) 적용 */
+.project-item:hover .project-dot,
+.project-item.active .project-dot {
+    background-color: #2563eb;
+    box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+}
+
+.project-item.active {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+/* 데이터가 없을 경우 텍스트 */
+.project-empty {
+    padding: 10px 20px;
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
 }

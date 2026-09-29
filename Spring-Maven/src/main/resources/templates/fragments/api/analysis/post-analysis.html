@@ -4,7 +4,7 @@
     <div th:fragment="postAnalysisForm" class="api-card card-post">
         <h3 style="color: var(--theme-post);">🛡️ 코드 보안 분석 요청 (POST)</h3>
         <div class="api-title">
-        <code>${API.ANALYSIS}</code>
+            <code>${API.ANALYSIS}</code>
         </div>
         <form id="analysisForm">
             <div class="form-group">
@@ -19,19 +19,20 @@
                 <label for="analysisCode">소스 코드</label>
                 <textarea id="analysisCode" class="form-control" rows="5" placeholder="String sql = ...;" required></textarea>
             </div>
-            <!-- 통일된 btn-post 클래스 -->
             <button type="submit" id="analysisSubmitBtn" class="btn btn-post">분석 실행</button>
         </form>
 
         <div id="analysisResultArea" class="result-area" style="display: none;">
-            <h4>📌 분석 결과 대시보드</h4>
-            <div class="alert-success" id="analysisSuccessMsg" style="display:none; background-color: #d4edda; color: #155724;"></div>
+            <h4>📌 분석 요청 접수 (Response)</h4>
+            <!-- 메시지 박스 수정: 진행 상태 안내 -->
+            <div class="alert-success" id="analysisSuccessMsg" style="display:none; background-color: #d4edda; color: #155724; font-weight: bold;"></div>
             
             <div class="dashboard-summary">
-                <p><strong>상태:</strong> <span id="resStatus"></span></p>
-                <p><strong>총 취약점 개수:</strong> <span id="resTotalCount"></span>개 (High: <span id="resHighCount" class="text-danger"></span>)</p>
+                <p><strong>진행 상태:</strong> <span id="resStatus" style="color: #0056b3; font-weight: bold;"></span></p>
+                <p style="font-size: 0.9em; color: #666;">※ 비동기 처리로 인해 0개로 표시됩니다. 분석 완료 후 GET 탭에서 확인하세요.</p>
+                <p><strong>임시 취약점 개수:</strong> <span id="resTotalCount"></span>개 (High: <span id="resHighCount" class="text-danger"></span>)</p>
             </div>
-            <h5>취약점 상세 내역</h5>
+            <h5>응답 JSON</h5>
             <pre><code id="analysisResultJson"></code></pre>
         </div>
 
@@ -41,7 +42,7 @@
                 
                 const btn = document.getElementById('analysisSubmitBtn');
                 btn.disabled = true;
-                btn.textContent = '분석 진행 중... ⏳';
+                btn.textContent = '분석 요청 중... ⏳';
 
                 const data = {
                     projectId: Number(document.getElementById('analysisProjectId').value),
@@ -52,13 +53,15 @@
                 try {
                     const result = await ApiService.post(API.ANALYSIS, data);
 
+                    // PENDING 상태 렌더링
                     document.getElementById('resStatus').textContent = result.status;
-                    document.getElementById('resTotalCount').textContent = result.totalCount;
-                    document.getElementById('resHighCount').textContent = result.highCount;
+                    document.getElementById('resTotalCount').textContent = result.totalCount || 0;
+                    document.getElementById('resHighCount').textContent = result.highCount || 0;
                     document.getElementById('analysisResultJson').textContent = JSON.stringify(result, null, 2);
                     
                     const successMsg = document.getElementById('analysisSuccessMsg');
-                    successMsg.textContent = '✅ 코드 분석이 완료되었습니다!';
+                    // Async 구조에 맞춘 안내 메시지
+                    successMsg.innerHTML = `✅ 분석이 <b>대기열(PENDING)</b>에 등록되었습니다!<br>👉 (요청 ID: ${result.analysisId}) 우측 탭에서 결과를 조회하세요.`;
                     successMsg.style.display = 'block';
                     
                     document.getElementById('analysisResultArea').style.display = 'block';
