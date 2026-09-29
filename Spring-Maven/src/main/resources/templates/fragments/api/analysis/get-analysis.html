@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="getAnalysisFragment" class="api-card card-get">
+        <h3 style="color: var(--theme-get);">🔍 분석 결과 단건 조회 (GET)</h3>
+        <div class="api-title">
+        <code>${API.ANALYSIS}/{id}</code>
+        </div>
+        <form id="getAnalysisForm">
+            <div class="form-group">
+                <label for="getAnalysisId">분석 요청 ID</label>
+                <div class="input-group">
+                    <input type="number" id="getAnalysisId" class="form-control" placeholder="ID 입력 (예: 1)" required>
+                    <!-- 통일된 btn-get 클래스 -->
+                    <button type="submit" id="getAnalysisBtn" class="btn btn-get">결과 조회</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="getAnalysisResultArea" class="result-area" style="display: none;">
+            <h4>📌 조회된 분석 결과</h4>
+            <pre><code id="getAnalysisResultJson"></code></pre>
+        </div>
+
+        <script>
+            document.getElementById('getAnalysisForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('getAnalysisId').value;
+                const btn = document.getElementById('getAnalysisBtn');
+                
+                btn.disabled = true;
+                btn.textContent = '조회 중...';
+
+                try {
+                    const result = await ApiService.get(`${API.ANALYSIS}/${id}`);
+                    
+                    document.getElementById('getAnalysisResultJson').textContent = JSON.stringify(result, null, 2);
+                    document.getElementById('getAnalysisResultArea').style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류 발생: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '결과 조회';
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

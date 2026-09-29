@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="postProjectForm" class="api-card card-post">
+        <h3 style="color: var(--theme-post);">🚀 프로젝트 등록 (POST)</h3>
+        
+        <form id="projectForm">
+            <div class="form-group">
+                <label for="projectName">프로젝트 이름</label>
+                <div class="api-title">
+                <code>${API.PROJECT}/{id}</code>
+                </div>
+                <input type="text" id="projectName" class="form-control" placeholder="예: 쇼핑몰 결제 시스템" required>
+            </div>
+
+            <div class="form-group">
+                <label for="projectLang">사용 언어</label>
+                <input type="text" id="projectLang" class="form-control" value="java" required>
+            </div>
+            <!-- 색상 변수가 적용된 btn-post 클래스 사용 -->
+            <button type="submit" id="submitProjectBtn" class="btn btn-post">프로젝트 생성</button>
+        </form>
+
+        <div id="resultArea" class="result-area" style="display: none;">
+            <div class="alert-success" id="postSuccessMsg" style="display:none; background-color: #d4edda; color: #155724;"></div>
+            <h4>📌 등록 결과 (Response)</h4>
+            <pre><code id="resultJson"></code></pre>
+        </div>
+
+        <script>
+            document.getElementById('projectForm').addEventListener('submit', async function(e) {
+                e.preventDefault(); 
+
+                const btn = document.getElementById('submitProjectBtn');
+                btn.disabled = true;
+                btn.textContent = '생성 중... ⏳';
+
+                const data = {
+                    name: document.getElementById('projectName').value,
+                    description: document.getElementById('projectDesc').value,
+                    language: document.getElementById('projectLang').value
+                };
+
+                try {
+                    const result = await ApiService.post(API.PROJECT, data);
+
+                    const resultArea = document.getElementById('resultArea');
+                    const successMsg = document.getElementById('postSuccessMsg');
+                    const resultJson = document.getElementById('resultJson');
+                    
+                    successMsg.textContent = `✅ 프로젝트가 성공적으로 등록되었습니다! (ID: ${result.id})`;
+                    successMsg.style.display = 'block';
+                    resultJson.textContent = JSON.stringify(result, 2);
+                    resultArea.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '프로젝트 생성';
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

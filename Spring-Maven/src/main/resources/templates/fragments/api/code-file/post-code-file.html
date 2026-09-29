@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="postCodeFileForm" class="api-card card-post">
+        <h3 style="color: var(--theme-post);">📄 코드 파일 생성 (POST)</h3>
+        <div class="api-title">
+        <code>${API.CODE_FILE}</code>
+        </div>
+        <form id="codeFileForm">
+            <div class="form-group">
+                <label for="codeProjectId">프로젝트 ID</label>
+                <input type="number" id="codeProjectId" class="form-control" placeholder="예: 1" required>
+            </div>
+            <div class="form-group">
+                <label for="codeFileName">파일 이름</label>
+                <input type="text" id="codeFileName" class="form-control" placeholder="예: UserService.java" required>
+            </div>
+            <div class="form-group">
+                <label for="codeLanguage">프로그래밍 언어</label>
+                <input type="text" id="codeLanguage" class="form-control" value="java" required>
+            </div>
+            <div class="form-group">
+                <label for="codeSourceCode">소스 코드 내용</label>
+                <textarea id="codeSourceCode" class="form-control" rows="5" placeholder="public class UserService { ... }" required></textarea>
+            </div>
+            <!-- 통일된 btn-post 클래스 사용 (인라인 스타일 제거) -->
+            <button type="submit" id="codeSubmitBtn" class="btn btn-post">파일 저장</button>
+        </form>
+
+        <div id="codePostResultArea" class="result-area" style="display: none;">
+            <div class="alert-success" id="codePostSuccessMsg" style="display:none; background-color: #d4edda; color: #155724;"></div>
+            <h4>📌 파일 등록 결과 (Response)</h4>
+            <pre><code id="codePostResultJson"></code></pre>
+        </div>
+
+        <script>
+            document.getElementById('codeFileForm').addEventListener('submit', async function(e) {
+                e.preventDefault(); 
+                
+                const btn = document.getElementById('codeSubmitBtn');
+                btn.disabled = true;
+                btn.textContent = '저장 중... ⏳';
+
+                const fileNameVal = document.getElementById('codeFileName').value;
+                const contentVal = document.getElementById('codeSourceCode').value;
+
+                // 📌 백엔드 ProjectFileDTO.Request 규격에 맞춘 객체 생성
+                const data = {
+                    projectId: Number(document.getElementById('codeProjectId').value),
+                    filePath: "src/main/java/" + fileNameVal, // 파일 경로 설정
+                    fileName: fileNameVal,
+                    language: document.getElementById('codeLanguage').value,
+                    content: contentVal,
+                    fileSizeBytes: new Blob([contentVal]).size // 텍스트 바이트 크기 자동 계산
+                };
+
+                try {
+                    const result = await ApiService.post(API.CODE_FILE, data);
+
+                    const resultArea = document.getElementById('codePostResultArea');
+                    const successMsg = document.getElementById('codePostSuccessMsg');
+                    const resultJson = document.getElementById('codePostResultJson');
+                    
+                    successMsg.textContent = `✅ 코드 파일이 성공적으로 생성되었습니다! (ID: ${result.id || '확인 완료'})`;
+                    successMsg.style.display = 'block';
+                    resultJson.textContent = JSON.stringify(result, null, 2);
+                    resultArea.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '파일 저장';
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

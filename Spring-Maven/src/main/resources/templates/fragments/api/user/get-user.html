@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <section th:fragment="getSection" class="api-section">
+        <div class="section-header">
+            <span class="method get">GET</span>
+        <div class="api-title">
+            <code>${API.USER}</code>
+        </div>
+            <h2 style="color: var(--theme-get);">회원 조회</h2>
+        </div>
+        
+        <!-- 카드에 card-get 클래스 추가 -->
+        <div class="api-card card-get">
+            <h3>1. 전체 회원 목록 조회</h3>
+
+            <button type="button" id="getAllUsersBtn" class="btn btn-get">전체 목록 가져오기</button>
+        </div>
+        <div class="api-title">
+            <code>${API.USER}/{id}</code>
+        </div>
+        <div class="api-card card-get">
+            <h3>2. ID로 단건 조회</h3>
+
+            <form id="getUserByIdForm">
+                <div class="form-group flex-group">
+                    <input type="number" id="searchUserId" class="form-control" placeholder="ID 입력" required>
+                    <button type="submit" class="btn btn-get">ID 조회</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="getUserResultArea" class="result-area">
+            <div class="alert-success" id="getSuccessMsg" style="display:none; background-color: #d1ecf1; color: #0c5460;"></div>
+            <strong>📌 조회 결과 (Response)</strong>
+            <pre><code id="getUserResultJson"></code></pre>
+        </div>
+
+        <script>
+            // 전체 조회
+            document.getElementById('getAllUsersBtn').addEventListener('click', async function() {
+                await fetchUserData(API.USER, this, '전체 목록 가져오기');
+            });
+
+            // ID 단건 조회
+            document.getElementById('getUserByIdForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const id = document.getElementById('searchUserId').value;
+                await fetchUserData(`${API.USER}/${id}`, this.querySelector('button'), 'ID 조회');
+            });
+
+            async function fetchUserData(url, btn, btnText) {
+                btn.disabled = true;
+                btn.textContent = '조회 중...';
+                try {
+                    const result = await ApiService.get(url);
+                    document.getElementById('getUserResultJson').textContent = JSON.stringify(result, null, 2);
+                    document.getElementById('getSuccessMsg').textContent = '✅ 조회 완료!';
+                    document.getElementById('getSuccessMsg').style.display = 'block';
+                    document.getElementById('getUserResultArea').style.display = 'block';
+                } catch (error) {
+                    alert('오류 발생: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = btnText;
+                }
+            }
+        </script>
+    </section>
+</body>
+</html>

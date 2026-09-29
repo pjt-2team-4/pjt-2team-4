@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head th:replace="~{fragments/head :: commonHead('프로젝트 관리')}"></head>
+<body>
+    <!-- (사이드바 코드 생략 - 기존과 동일) -->
+
+    <div class="main-content">
+        <div class="container">
+            <header class="header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>📂 프로젝트 관리</h1>
+                    <p>내 프로젝트 목록을 조회하고 수정/삭제할 수 있습니다.</p>
+                </div>
+                <a th:href="@{/projects/new}" class="execute-button post-button" style="text-decoration: none; width: auto;">+ 새 프로젝트</a>
+            </header>
+
+            <section class="section">
+                <div class="card">
+                    <table class="api-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">ID</th>
+                                <th width="60%">프로젝트명</th>
+                                <th width="30%">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 등록된 프로젝트가 없을 때 -->
+                            <tr th:if="${#lists.isEmpty(projects)}">
+                                <td colspan="3" style="text-align: center; padding: 30px; color: #7f8c8d;">
+                                    생성된 프로젝트가 없습니다.
+                                </td>
+                            </tr>
+                            <!-- 프로젝트 목록 출력 -->
+                            <tr th:each="p : ${projects}">
+                                <td><strong th:text="${p.id}">1</strong></td>
+                                <td th:text="${p.name}">쇼핑몰 백엔드</td>
+                                <td>
+                                    <a th:href="@{/projects/{id}/edit(id=${p.id})}" 
+                                       style="display:inline-block; padding: 6px 12px; background-color: #f39c12; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9em; margin-right: 5px;">수정</a>
+                                    
+                                    <!-- 삭제는 안전을 위해 POST 폼으로 요청 -->
+                                    <form th:action="@{/projects/{id}/delete(id=${p.id})}" method="post" style="display: inline;"
+                                          onsubmit="return confirm('이 프로젝트와 관련된 모든 코드 분석 기록이 삭제됩니다. 계속하시겠습니까?');">
+                                        <button type="submit" style="padding: 6px 12px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 0.9em; cursor: pointer;">삭제</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
