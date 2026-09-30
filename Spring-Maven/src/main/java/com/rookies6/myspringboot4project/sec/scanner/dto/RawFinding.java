@@ -1,6 +1,6 @@
 package com.rookies6.myspringboot4project.sec.scanner.dto;
 
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 
 /** Scanner가 생성하는 취약점 탐지 결과. */

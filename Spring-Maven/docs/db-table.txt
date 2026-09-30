@@ -3,12 +3,10 @@
 desc analysis_files;
 desc analysis_requests;
 desc users;
-desc vulnerability_finding;
-
+desc finding_vulnerability;
 
 select * from analysis_files;
 select * from analysis_requests;
 select * from users;
-select * from vulnerability_finding;
-
+select * from finding_vulnerability;
 

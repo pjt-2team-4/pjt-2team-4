@@ -2,7 +2,7 @@ package com.rookies6.myspringboot4project.sec.analysisfile.entity;
 
 import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.common.enums.FindingVulnerability;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,7 +48,7 @@ public class AnalysisFile extends BaseEntity {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    private List<VulnerabilityFinding> findings = new ArrayList<>();
+    private List<FindingVulnerability> findings = new ArrayList<>();
 
     @Builder
     public AnalysisFile(String relativePath, String fileName, String language, String content, Integer lineCount) {
@@ -63,7 +63,7 @@ public class AnalysisFile extends BaseEntity {
         this.analysisRequest = analysisRequest;
     }
 
-    public void addFinding(VulnerabilityFinding finding) {
+    public void addFinding(FindingVulnerability finding) {
         this.findings.add(finding);
         finding.assignTo(this);
     }

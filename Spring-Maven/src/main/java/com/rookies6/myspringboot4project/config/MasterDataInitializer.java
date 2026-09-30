@@ -2,8 +2,8 @@ package com.rookies6.myspringboot4project.config;
 
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.FindingVulnerability;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
@@ -26,7 +26,6 @@ public class MasterDataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        // 1. 유저 초기화
         User user1 = userRepository.findByEmail("admin@codeguard.com")
                 .orElseGet(() -> userRepository.save(
                         User.builder().email("admin@codeguard.com").password("hashed_password_123").build()
@@ -42,10 +41,8 @@ public class MasterDataInitializer implements CommandLineRunner {
                         User.builder().email("security@codeguard.com").password("hashed_password_789").build()
                 ));
 
-        // 2. 분석 요청(AnalysisRequest) 및 파일/취약점 초기화
         if (analysisRequestRepository.count() == 0) {
             
-            // --- [분석 1] 스프링 시큐어 뱅킹 시스템 (COMPLETED) ---
             AnalysisRequest request1 = AnalysisRequest.builder()
                     .user(user1)
                     .title("스프링 시큐어 뱅킹 시스템 취약점 분석")
@@ -62,13 +59,10 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "    }\n" +
                             "}");
             
-            // HARDCODED_SECRET 사용 (MVP 3종 중 하나)
-            file1_1.addFinding(VulnerabilityFinding.builder()
-                    .title("Hardcoded AWS Secret Key")
+            file1_1.addFinding(FindingVulnerability.builder()
                     .ruleId("SEC-001")
                     .vulnerabilityType(VulnerabilityType.HARDCODED_SECRET)
                     .severity(Severity.CRITICAL)
-                    .description("소스코드에 AWS Secret Key가 하드코딩되어 있습니다. 환경 변수나 Secret Manager를 사용하세요.")
                     .startLine(2).endLine(2)
                     .codeSnippet("private String awsSecretKey = \"AKIAIOSFODNN7EXAMPLE\";")
                     .build());
@@ -82,7 +76,6 @@ public class MasterDataInitializer implements CommandLineRunner {
 
             AnalysisFile file1_3 = createFile("src/main/java/TransactionDao.java", "TransactionDao.java",
                     "public class TransactionDao {\n" +
-                            "    // TODO: Use parameterized queries\n" +
                             "    public String query = \"SELECT * FROM accounts\";\n" +
                             "}");
 
@@ -90,7 +83,6 @@ public class MasterDataInitializer implements CommandLineRunner {
             request1.addFile(file1_2);
             request1.addFile(file1_3);
 
-            // --- [분석 2] 이커머스 결제 API 서버 (SCANNING) ---
             AnalysisRequest request2 = AnalysisRequest.builder()
                     .user(user1)
                     .title("이커머스 결제 API 서버 보안 검사")
@@ -115,7 +107,6 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "    }\n" +
                             "}"));
 
-            // --- [분석 3] 사용자 인증 마이크로서비스 (PENDING) ---
             AnalysisRequest request3 = AnalysisRequest.builder()
                     .user(user2)
                     .title("사용자 인증 마이크로서비스 코드 스캔")
@@ -136,7 +127,6 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "    }\n" +
                             "}"));
             
-            // --- [분석 4] 클라우드 파일 관리 시스템 (FAILED) ---
             AnalysisRequest request4 = AnalysisRequest.builder()
                     .user(user3)
                     .title("클라우드 파일 관리 시스템 진단")
@@ -155,20 +145,16 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "    }\n" +
                             "}");
             
-            // XSS 사용 (MVP 3종 중 하나)
-            file4_1.addFinding(VulnerabilityFinding.builder()
-                    .title("Reflected XSS Vulnerability")
+            file4_1.addFinding(FindingVulnerability.builder()
                     .ruleId("SEC-002")
                     .vulnerabilityType(VulnerabilityType.XSS)
                     .severity(Severity.HIGH)
-                    .description("사용자 입력값(keyword)이 적절한 검증이나 인코딩 없이 응답에 포함되어 스크립트가 실행될 수 있습니다.")
                     .startLine(5).endLine(5)
                     .codeSnippet("return \"<div>Result: \" + keyword + \"</div>\";")
                     .build());
 
             request4.addFile(file4_1);
 
-            // 4. 연쇄 저장 처리
             analysisRequestRepository.saveAll(List.of(request1, request2, request3, request4));
         }
     }
