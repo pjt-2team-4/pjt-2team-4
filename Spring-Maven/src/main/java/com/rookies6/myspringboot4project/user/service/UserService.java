@@ -42,7 +42,7 @@ public class UserService {
         return UserDTO.Response.fromEntity(user);
     }
 
-    // 3. 이메일로 유저 조회 (기존 학번 조회 대체)
+    // 3. 이메일로 유저 조회
     public UserDTO.Response getUserByEmail(String email) {
         User user = userRepository
                 .findByEmail(email)
@@ -65,12 +65,12 @@ public class UserService {
         // 이메일 중복 검사
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException(
-                    ErrorCode.EMAIL_DUPLICATE, // 기존 STUDENT_NUMBER_DUPLICATE 대체
+                    ErrorCode.EMAIL_DUPLICATE,
                     request.getEmail()
             );
         }
 
-        // User 생성
+        // User 생성 (email, password만 사용)
         User user = User.builder()
                 .email(request.getEmail())
                 .password(request.getPassword()) // 추후 Spring Security 적용 시 암호화(BCrypt) 필요
@@ -128,5 +128,25 @@ public class UserService {
         }
 
         userRepository.deleteById(id);
+    }
+
+    // 7. 로그인 처리
+    public UserDTO.Response login(UserDTO.LoginRequest request) {
+        // 1. 이메일로 유저 조회
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "User",
+                        "email",
+                        request.getEmail()
+                ));
+
+        // 2. 비밀번호 일치 여부 확인
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 3. 로그인 성공 시 응답 DTO 반환
+        return UserDTO.Response.fromEntity(user);
     }
 }

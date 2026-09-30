@@ -1,0 +1,133 @@
+/* src/pages/analysis/AnalysisDetail.module.css */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pdfBtn {
+  padding: 10px 18px;
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pdfBtn:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.reportCard {
+  padding: 32px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.reportHeader {
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.reportTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.metaText {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.statsGrid {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  flex: 1;
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.statValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+/* 소스 코드 및 파일 보기 스펙 */
+.fileCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+  background-color: #f8fafc;
+  margin-bottom: 12px;
+}
+
+.codeBlock {
+  background-color: #1e293b;
+  color: #38bdf8;
+  padding: 14px;
+  border-radius: 6px;
+  font-family: "Fira Code", monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+/* 취약점 탐지 내역 카드 */
+.vulnCard {
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.vulnHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cweBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  background-color: #eff6ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}

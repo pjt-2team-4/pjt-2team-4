@@ -3,7 +3,7 @@
 <head th:fragment="commonHead (title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title}">회원 관리 시스템</title>
+    <title th:text="${uiSettings?.title ?: '기본 타이틀'}">회원 관리 시스템</title>
 
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/admin-style.css}" />

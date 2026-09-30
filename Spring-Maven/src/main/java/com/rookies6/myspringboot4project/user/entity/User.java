@@ -4,13 +4,12 @@ import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class User extends BaseEntity {
 
     @Id
@@ -24,19 +23,16 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String password;
 
-
     @Builder
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    // Setter 대신 의미 있는 비즈니스 메서드 사용 권장
     public void changePassword(String newPassword) {
         this.password = newPassword;
     }
 
-    // 이 메서드를 추가해 주세요!
     public void changeEmail(String newEmail) {
         this.email = newEmail;
     }

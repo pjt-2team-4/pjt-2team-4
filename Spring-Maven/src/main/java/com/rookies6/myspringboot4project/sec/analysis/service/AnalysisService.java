@@ -2,166 +2,114 @@ package com.rookies6.myspringboot4project.sec.analysis.service;
 
 import com.rookies6.myspringboot4project.exception.BusinessException;
 import com.rookies6.myspringboot4project.exception.ErrorCode;
-import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisDTO;
-import com.rookies6.myspringboot4project.sec.analysisfile.dto.AnalysisFileDTO;
-import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
+import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisRequestDto;
+import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisResponseDto;
+import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisStatusResponseDto;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
-import com.rookies6.myspringboot4project.user.entity.User;
-import com.rookies6.myspringboot4project.user.repository.UserRepository;
+import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
+import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
+import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AnalysisService {
 
     private final AnalysisRequestRepository analysisRequestRepository;
-    private final UserRepository userRepository; 
-    private final AnalysisWorker analysisWorker;
 
     /**
-     * 분석 요청
+     * 1. 전체 분석 히스토리 목록 조회
      */
-    @Transactional
-    public AnalysisDTO.Response analyzeCode(AnalysisDTO.Request request) {
-
-        // 1. 사용자 조회
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "User", "id", 1L
-                ));
-
-        // 2. 분석 요청(엔티티) 생성
-        AnalysisRequest analysisRequest = AnalysisRequest.create(
-                user,
-                request.getTitle(),
-                request.getLanguage(),
-                30 // estimatedDurationSeconds
-        );
-
-        // 3. 클라이언트가 보낸 파일 데이터를 AnalysisFile로 변환하여 추가
-        List<AnalysisDTO.Request.FileRequest> targetFiles = request.getFiles();
-
-        if (targetFiles == null || targetFiles.isEmpty()) {
-            throw new BusinessException(
-                    ErrorCode.INVALID_INPUT, "분석할 파일이 존재하지 않습니다."
-            );
-        }
-
-        for (AnalysisDTO.Request.FileRequest fileReq : targetFiles) {
-            int lineCount = fileReq.getContent() != null
-                    ? fileReq.getContent().split("\n", -1).length
-                    : 0;
-
-            AnalysisFile analysisFile = AnalysisFile.builder()
-                    .relativePath(fileReq.getFilePath())
-                    .fileName(extractFileName(fileReq.getFilePath()))
-                    .language(request.getLanguage())
-                    .content(fileReq.getContent())
-                    .lineCount(lineCount)
-                    .build();
-
-            analysisRequest.addFile(analysisFile);
-        }
-
-        // 4. 분석 요청 저장
-        AnalysisRequest savedRequest = analysisRequestRepository.save(analysisRequest);
-
-        log.info("분석 요청 생성 완료. analysisId={}", savedRequest.getId());
-
-        // 5. 비동기 분석 시작
-        analysisWorker.runAnalysisPipeline(savedRequest.getId());
-
-        // 6. 즉시 응답
-        return AnalysisDTO.Response.fromEntity(savedRequest);
-    }
-
-    /**
-     * 분석 목록
-     */
-    public List<AnalysisDTO.Response> getAnalyses() {
+    public List<AnalysisResponseDto> getAllAnalyses() {
         return analysisRequestRepository.findAll()
                 .stream()
-                .map(AnalysisDTO.Response::fromEntity)
+                .map(AnalysisResponseDto::fromEntity)
                 .toList();
     }
 
     /**
-     * 분석 상세
+     * 2. ID로 분석 결과 상세 조회
      */
-    public AnalysisDTO.Response getAnalysisById(Long id) {
-        AnalysisRequest analysisRequest = analysisRequestRepository.findById(id)
+    public AnalysisResponseDto getAnalysisById(Long id) {
+        AnalysisRequest request = analysisRequestRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
                 ));
-
-        return AnalysisDTO.Response.fromEntity(analysisRequest);
+        return AnalysisResponseDto.fromEntity(request);
     }
 
     /**
-     * 분석 상태
+     * 3. 비동기 스캔 진행 상태 조회
      */
-    public AnalysisDTO.StatusResponse getAnalysisStatus(Long id) {
-        AnalysisRequest analysisRequest = analysisRequestRepository.findById(id)
+    public AnalysisStatusResponseDto getAnalysisStatus(Long id) {
+        AnalysisRequest request = analysisRequestRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
                 ));
-
-        return AnalysisDTO.StatusResponse.fromEntity(analysisRequest);
-    }
-
-/**
-     * 특정 분석 ID에 속한 파일 목록 조회
-     */
-    public List<AnalysisFileDTO.Response> getFilesByAnalysisId(Long analysisId) {
-        AnalysisRequest analysisRequest = analysisRequestRepository.findById(analysisId)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", analysisId
-                ));
-
-        return analysisRequest.getAnalysisFiles().stream()
-                .map(AnalysisFileDTO.Response::new) // 생성자를 통해 바로 변환
-                .toList();
+        return AnalysisStatusResponseDto.fromEntity(request);
     }
 
     /**
-     * 특정 분석의 특정 파일 상세 내용 조회
+     * 4. 새 분석 요청 생성 및 파일 엔티티 매핑
      */
-    public AnalysisFileDTO.DetailResponse getFileDetail(Long analysisId, Long fileId) {
-        AnalysisRequest analysisRequest = analysisRequestRepository.findById(analysisId)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", analysisId
-                ));
+    @Transactional
+    public AnalysisResponseDto createAnalysis(AnalysisRequestDto requestDto) {
+        // AnalysisRequest 엔티티 생성 (초기 상태: PENDING)
+        AnalysisRequest request = AnalysisRequest.builder()
+                .title(requestDto.getTitle())
+                .language(requestDto.getLanguage())
+                .status(AnalysisStatus.PENDING)
+                .build();
 
-        AnalysisFile targetFile = analysisRequest.getAnalysisFiles().stream()
-                .filter(file -> file.getId().equals(fileId))
-                .findFirst()
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisFile", "id", fileId
-                ));
+        // 첨부 파일 목록 매핑 및 연관관계 설정
+        if (requestDto.getFiles() != null && !requestDto.getFiles().isEmpty()) {
+            List<AnalysisFile> files = requestDto.getFiles().stream()
+                    .map(fileDto -> {
+                        String path = fileDto.getFilePath();
+                        String fileName = path.contains("/") 
+                                ? path.substring(path.lastIndexOf("/") + 1) 
+                                : path;
+                        int lineCount = fileDto.getContent() != null 
+                                ? fileDto.getContent().split("\n").length 
+                                : 0;
 
-        return new AnalysisFileDTO.DetailResponse(targetFile); // 생성자를 통해 바로 변환
+                        return AnalysisFile.builder()
+                                .fileName(fileName)
+                                .relativePath(path)
+                                .language(requestDto.getLanguage())
+                                .lineCount(lineCount)
+                                .content(fileDto.getContent())
+                                .analysisRequest(request)
+                                .build();
+                    })
+                    .toList();
+
+            request.getAnalysisFiles().addAll(files);
+        }
+
+        AnalysisRequest savedRequest = analysisRequestRepository.save(request);
+
+        return AnalysisResponseDto.fromEntity(savedRequest);
     }
 
     /**
-     * 분석 삭제
+     * 5. 분석 히스토리 삭제
      */
     @Transactional
     public void deleteAnalysis(Long id) {
-        AnalysisRequest analysisRequest = analysisRequestRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
-                ));
-
-        analysisRequestRepository.delete(analysisRequest);
+        if (!analysisRequestRepository.existsById(id)) {
+            throw new BusinessException(
+                    ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
+            );
+        }
+        analysisRequestRepository.deleteById(id);
     }
+
 
     // 유틸리티 메서드: 경로에서 파일명만 추출
     private String extractFileName(String filePath) {

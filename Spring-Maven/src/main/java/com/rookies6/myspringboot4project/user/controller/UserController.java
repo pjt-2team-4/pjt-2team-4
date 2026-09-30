@@ -11,47 +11,72 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/users") // 📌 /api/v1/users 로 버전 명시 및 복수형 정리
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    // 1. 전체 유저 조회
+    /**
+     * 전체 유저 목록 조회 (Admin 전용)
+     * GET /api/v1/users
+     */
     @GetMapping
     public ResponseEntity<List<UserDTO.Response>> getAllUsers() {
         List<UserDTO.Response> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    // 2. ID로 유저 조회
+    /**
+     * ID로 유저 조회
+     * GET /api/v1/users/{id}
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO.Response> getUserById(
-            @PathVariable Long id) {
-
+    public ResponseEntity<UserDTO.Response> getUserById(@PathVariable Long id) {
         UserDTO.Response user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
-    // 3. 이메일로 유저 조회 (기존 학번 검색 대체)
+    /**
+     * 이메일로 유저 조회
+     * GET /api/v1/users/email/{email}
+     */
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO.Response> getUserByEmail(
-            @PathVariable String email) {
-
+    public ResponseEntity<UserDTO.Response> getUserByEmail(@PathVariable String email) {
         UserDTO.Response user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }
 
-    // 4. 유저 생성 (회원가입)
+    /**
+     * 회원가입
+     * POST /api/v1/users/signup (또는 POST /api/v1/users)
+     */
     @PostMapping
-    public ResponseEntity<UserDTO.Response> createUser(
-            @Valid @RequestBody UserDTO.Request request) {
-
+    public ResponseEntity<UserDTO.Response> createUser(@Valid @RequestBody UserDTO.Request request) {
         UserDTO.Response createdUser = userService.createUser(request);
         return ResponseEntity.ok(createdUser);
     }
 
-    // 5. 유저 수정
+    @PostMapping("/signup")
+    public ResponseEntity<UserDTO.Response> signUpUser(@Valid @RequestBody UserDTO.Request request) {
+        UserDTO.Response createdUser = userService.createUser(request);
+        return ResponseEntity.ok(createdUser);
+    }
+
+    /**
+     * 로그인
+     * POST /api/v1/users/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO.Response> loginUser(@RequestBody UserDTO.LoginRequest loginRequest) {
+        UserDTO.Response loggedInUser = userService.login(loginRequest);
+        return ResponseEntity.ok(loggedInUser);
+    }
+
+    /**
+     * 유저 정보 수정
+     * PUT /api/v1/users/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO.Response> updateUser(
             @PathVariable Long id,
@@ -61,10 +86,12 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    // 6. 유저 삭제
+    /**
+     * 유저 삭제
+     * DELETE /api/v1/users/{id}
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }

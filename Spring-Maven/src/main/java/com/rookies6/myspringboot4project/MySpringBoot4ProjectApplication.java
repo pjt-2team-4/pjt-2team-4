@@ -2,13 +2,15 @@ package com.rookies6.myspringboot4project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
+import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+//import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing; // 추가
 
+//@EnableAdminServer
 @EnableJpaAuditing // 이 줄을 반드시 추가
 @SpringBootApplication
-@ConfigurationPropertiesScan
+//@ConfigurationPropertiesScan
 public class MySpringBoot4ProjectApplication {
 
     public static void main(String[] args) {
