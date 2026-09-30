@@ -2,7 +2,7 @@ package com.rookies6.myspringboot4project.sec.analysis.dto;
 
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.common.enums.Severity; // 공통 텀포넌트 import 경로 수정
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.analysis.entity.FindingVulnerability;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -62,7 +62,7 @@ public class AnalysisDTO {
             this.language = request.getLanguage();
             this.status = request.getStatus().name();
 
-            List<VulnerabilityFinding> allFindings = request.getAnalysisFiles().stream()
+            List<FindingVulnerability> allFindings = request.getAnalysisFiles().stream()
                     .flatMap(file -> file.getFindings().stream())
                     .toList();
 
@@ -118,7 +118,7 @@ public class AnalysisDTO {
         private final Integer endLine;
         private final String codeSnippet;
 
-        public VulnerabilityDto(VulnerabilityFinding finding) {
+        public VulnerabilityDto(FindingVulnerability finding) {
             this.id = finding.getId();
             this.fileId = finding.getAnalysisFile() != null ? finding.getAnalysisFile().getId() : null;
             this.fileName = finding.getAnalysisFile() != null ? finding.getAnalysisFile().getFileName() : null;

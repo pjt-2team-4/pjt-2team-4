@@ -4,7 +4,7 @@ import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.analysis.entity.FindingVulnerability;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class AnalysisWorker {
             Thread.sleep(3000);
 
             // 3단계. 분석 결과 생성 및 파일에 매핑 (Enum 사용)
-            VulnerabilityFinding finding = VulnerabilityFinding.builder()
+            FindingVulnerability finding = FindingVulnerability.builder()
                     .ruleId("SQLI-001")
                     .vulnerabilityType(VulnerabilityType.SQL_INJECTION) // Enum 직접 사용
                     .severity(Severity.HIGH)                            // Enum 직접 사용

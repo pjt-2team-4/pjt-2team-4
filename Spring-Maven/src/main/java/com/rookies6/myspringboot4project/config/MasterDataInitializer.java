@@ -1,9 +1,9 @@
 package com.rookies6.myspringboot4project.config;
 
-import com.rookies6.myspringboot4project.sec/common/enums.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec/common/enums.AnalysisStatus;
-import com.rookies6.myspringboot4project.sec/common/enums.Severity;
-import com.rookies6.myspringboot4project.sec/common/enums.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
+import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.analysis.entity.FindingVulnerability;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
@@ -63,7 +63,7 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "}");
             
             // HARDCODED_SECRET 사용 (MVP 3종 중 하나)
-            file1_1.addFinding(VulnerabilityFinding.builder()
+            file1_1.addFinding(FindingVulnerability.builder()
                     .title("Hardcoded AWS Secret Key")
                     .ruleId("SEC-001")
                     .vulnerabilityType(VulnerabilityType.HARDCODED_SECRET)
@@ -156,7 +156,7 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "}");
             
             // XSS 사용 (MVP 3종 중 하나)
-            file4_1.addFinding(VulnerabilityFinding.builder()
+            file4_1.addFinding(FindingVulnerability.builder()
                     .title("Reflected XSS Vulnerability")
                     .ruleId("SEC-002")
                     .vulnerabilityType(VulnerabilityType.XSS)
