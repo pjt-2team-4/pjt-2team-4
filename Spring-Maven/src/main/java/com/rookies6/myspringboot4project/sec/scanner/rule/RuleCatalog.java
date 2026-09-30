@@ -1,6 +1,7 @@
 package com.rookies6.myspringboot4project.sec.scanner.rule;
 
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
+
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 
@@ -146,3 +147,4 @@ public final class RuleCatalog {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 룰: " + ruleId));
     }
 }
+

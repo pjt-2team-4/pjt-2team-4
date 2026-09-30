@@ -1,7 +1,6 @@
 package com.rookies6.myspringboot4project.user.entity;
 
 import com.rookies6.myspringboot4project.common.entity.BaseEntity;
-import com.rookies6.myspringboot4project.sec.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,8 +24,6 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Project> projects = new ArrayList<>();
 
     @Builder
     public User(String email, String password) {

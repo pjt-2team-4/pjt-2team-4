@@ -1,3 +1,4 @@
+
 package com.rookies6.myspringboot4project.sec.analysis.repository;
 
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
