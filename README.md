@@ -1,7 +1,9 @@
 
 
 
-# 프로젝트 패키지 Overview (MasterDataInitializer 포함) - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
+# 프로젝트 패키지 Overview (MasterDataInitializer 포함)
+
+ - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
 
 `sec` (보안 스캐너 및 분석 핵심 로직) 영역은 별도로 다루고, 여기서는 애플리케이션의 기반이 되는 **`common`, `config`, `exception`, `pages**` 영역을 최신 아키텍처에 맞추어 정리합니다.
 

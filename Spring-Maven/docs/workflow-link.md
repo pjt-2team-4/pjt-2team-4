@@ -1,5 +1,7 @@
 
-## Thymeleaf 를 이용한 임시 프론트 html 부분 - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
+## Thymeleaf 를 이용한 임시 프론트 html 부분
+
+ - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
 
  | 역할 | 이동 경로 |
 | --- | --- |

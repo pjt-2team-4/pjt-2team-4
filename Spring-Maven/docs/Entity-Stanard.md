@@ -1,5 +1,7 @@
 
-# ERD (Entity Relationship Diagram) - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
+# ERD (Entity Relationship Diagram)
+
+ - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
 
 ## 📌 확정된 도메인 스키마 (DB 반영 완료)
 

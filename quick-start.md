@@ -1,6 +1,8 @@
 
 
-# Quick Start Guide - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
+# Quick Start Guide
+
+ - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
 
 ## 1. 데이터베이스 세팅 (Windows CMD)
 
