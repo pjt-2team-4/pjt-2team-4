@@ -1,9 +1,9 @@
 package com.rookies6.myspringboot4project.config;
 
-import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec/common/enums.AnalysisRequest;
+import com.rookies6.myspringboot4project.sec/common/enums.AnalysisStatus;
+import com.rookies6.myspringboot4project.sec/common/enums.Severity;
+import com.rookies6.myspringboot4project.sec/common/enums.VulnerabilityFinding;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;

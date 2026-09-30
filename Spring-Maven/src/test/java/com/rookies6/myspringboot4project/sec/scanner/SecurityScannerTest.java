@@ -1,7 +1,8 @@
 package com.rookies6.myspringboot4project.sec.scanner;
 
+// 공통 enums 컴포넌트 import 경로 수정
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity; // ✅ 올바른 경로
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import com.rookies6.myspringboot4project.sec.scanner.SecurityScanner;
 import com.rookies6.myspringboot4project.sec.scanner.dto.RawFinding;

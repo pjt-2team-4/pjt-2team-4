@@ -2,7 +2,7 @@ package com.rookies6.myspringboot4project.sec.analysisfile.entity;
 
 import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.analysis.entity.FindingVulnerability;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

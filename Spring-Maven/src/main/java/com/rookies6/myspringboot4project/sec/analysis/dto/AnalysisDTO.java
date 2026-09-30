@@ -1,7 +1,7 @@
 package com.rookies6.myspringboot4project.sec.analysis.dto;
 
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity; // 공통 텀포넌트 import 경로 수정
 import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
