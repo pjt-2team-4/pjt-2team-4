@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -77,7 +79,15 @@ public class AnalysisService {
         log.info("분석 요청 생성 완료. analysisId={}", savedRequest.getId());
 
         // 5. 비동기 분석 시작
-        analysisWorker.runAnalysisPipeline(savedRequest.getId());
+//        analysisWorker.runAnalysisPipeline(savedRequest.getId());
+        Long analysisId = savedRequest.getId();
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        analysisWorker.runAnalysisPipeline(analysisId);
+                    }
+                });
 
         // 6. 즉시 응답
         return AnalysisDTO.Response.fromEntity(savedRequest);

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class AnalysisController {
         AnalysisDTO.Response response =
                 analysisService.analyzeCode(request);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     /**
