@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "analysis_requests")
@@ -41,6 +42,16 @@ public class AnalysisRequest extends BaseEntity {
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
+
+    // issue6 탐지 진행 컬럼 추가 (startedAt, completedAt, totalFindings)
+    @Column(name = "total_findings", nullable = false)
+    private Integer totalFindings = 0;
+
+    @Column(name = "started_at")
+    private LocalDateTime startedAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 
     // AnalysisFile과의 연관관계 (CascadeType.ALL로 파일도 함께 관리)
     @OneToMany(
@@ -94,7 +105,9 @@ public class AnalysisRequest extends BaseEntity {
     }
 
     public boolean isInProgress() {
-        return this.status == AnalysisStatus.SCANNING || this.status == AnalysisStatus.EXPLAINING;
+        return this.status == AnalysisStatus.PENDING
+                || this.status == AnalysisStatus.SCANNING
+                || this.status == AnalysisStatus.EXPLAINING;
     }
 
     public void markAsCompleted() {
@@ -115,5 +128,32 @@ public class AnalysisRequest extends BaseEntity {
                 .filter(file -> file.getRelativePath().equals(relativePath))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 경로의 파일을 찾을 수 없습니다: " + relativePath));
+    }
+
+    // Issue6 상태전이 메서드들 추가
+    public void startScanning() {
+        if (this.status != AnalysisStatus.PENDING) {
+            throw new IllegalStateException("PENDING 상태에서만 분석을 시작할 수 있습니다. 현재: " + this.status);
+        }
+        this.status = AnalysisStatus.SCANNING;
+        this.startedAt = LocalDateTime.now();
+    }
+
+    public void complete(int totalFindings) {
+        if (this.status != AnalysisStatus.SCANNING && this.status != AnalysisStatus.EXPLAINING) {
+            throw new IllegalStateException("진행 중인 분석만 완료할 수 있습니다. 현재: " + this.status);
+        }
+        this.totalFindings = totalFindings;
+        this.status = AnalysisStatus.COMPLETED;
+        this.completedAt = LocalDateTime.now();
+    }
+
+    public void fail(String message) {
+        if (!isInProgress()) {
+            throw new IllegalStateException("진행 중인 분석만 실패 처리할 수 있습니다. 현재: " + this.status);
+        }
+        this.status = AnalysisStatus.FAILED;
+        this.errorMessage = message;
+        this.completedAt = LocalDateTime.now();
     }
 }
