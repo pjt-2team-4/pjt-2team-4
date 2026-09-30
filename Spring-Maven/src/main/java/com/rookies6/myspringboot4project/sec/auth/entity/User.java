@@ -1,4 +1,4 @@
-package com.rookies6.myspringboot4project.auth.entity;
+package com.rookies6.myspringboot4project.sec.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

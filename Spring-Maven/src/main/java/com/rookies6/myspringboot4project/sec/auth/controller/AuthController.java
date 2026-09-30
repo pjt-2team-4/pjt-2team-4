@@ -1,7 +1,7 @@
-package com.rookies6.myspringboot4project.auth.controller;
+package com.rookies6.myspringboot4project.sec.auth.controller;
 
-import com.rookies6.myspringboot4project.auth.dto.SignupDTO;
-import com.rookies6.myspringboot4project.auth.service.AuthService;
+import com.rookies6.myspringboot4project.sec.auth.dto.SignupDTO;
+import com.rookies6.myspringboot4project.sec.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
