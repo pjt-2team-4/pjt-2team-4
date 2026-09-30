@@ -1,44 +1,67 @@
 // js/api-service.js
+
 const ApiService = {
-    async post(url, data) {
+
+    async request(url, options = {}) {
         const response = await fetch(url, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            }
+        });
+
+        const text = await response.text();
+        
+        // 응답 텍스트를 JSON으로 안전하게 파싱 시도
+        let data = {};
+        try {
+            data = text ? JSON.parse(text) : {};
+        } catch (e) {
+            data = { message: text };
+        }
+
+        if (!response.ok) {
+            // 💡 핵심: 백엔드가 내려준 에러 JSON(code, message 등)을 에러 객체에 실어줍니다.
+            const error = new Error(data.message || `HTTP Error: ${response.status}`);
+            
+            // Axios 스타일의 error.response 구조를 모방하여 주입
+            error.response = {
+                status: response.status,
+                statusText: response.statusText,
+                data: data // 백엔드 GlobalExceptionHandler가 보낸 ErrorCode, message 등이 여기에 담김!
+            };
+
+            // 커스텀 데이터 속성도 함께 제공
+            error.data = data;
+
+            throw error;
+        }
+
+        return data;
+    },
+
+    async get(url) {
+        return this.request(url);
+    },
+
+    async post(url, data) {
+        return this.request(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        return await response.json();
-    },
-    
-    async get(url) {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        return await response.json();
     },
 
     async put(url, data) {
-        const response = await fetch(url, {
+        return this.request(url, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        const text = await response.text(); 
-        return text ? JSON.parse(text) : {};
     },
 
     async delete(url) {
-        const response = await fetch(url, { method: 'DELETE' });
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        const text = await response.text(); 
-        return text ? JSON.parse(text) : { message: "삭제 성공" };
+        return this.request(url, {
+            method: 'DELETE'
+        });
     }
-};
-const requestData = {
-    projectId: 1,
-    filePath: "src/services/UseService.java", // 파일 경로
-    fileName: "UseService.java",             // 👈 빠져있던 파일 이름 추가!
-    language: "java",
-    content: "seServiseServiseServiseServi",
-    fileSizeBytes: new Blob(["seServiseServiseServiseServi"]).size
 };

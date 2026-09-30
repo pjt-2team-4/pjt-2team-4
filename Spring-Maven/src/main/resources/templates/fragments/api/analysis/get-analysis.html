@@ -4,21 +4,26 @@
     <div th:fragment="getAnalysisFragment" class="api-card card-get">
         <h3 style="color: var(--theme-get);">🔍 분석 결과 단건 조회 (GET)</h3>
         <div class="api-title">
-        <code>${API.ANALYSIS}/{id}</code>
+            <code>${API.ANALYSIS}/{id}</code>
         </div>
         <form id="getAnalysisForm">
             <div class="form-group">
                 <label for="getAnalysisId">분석 요청 ID</label>
                 <div class="input-group">
                     <input type="number" id="getAnalysisId" class="form-control" placeholder="ID 입력 (예: 1)" required>
-                    <!-- 통일된 btn-get 클래스 -->
-                    <button type="submit" id="getAnalysisBtn" class="btn btn-get">결과 조회</button>
+                    <button type="submit" id="getAnalysisBtn" class="btn btn-get">진행상태 조회</button>
                 </div>
             </div>
         </form>
 
         <div id="getAnalysisResultArea" class="result-area" style="display: none;">
-            <h4>📌 조회된 분석 결과</h4>
+            <!-- 상태를 눈에 띄게 보여주는 뱃지 영역 -->
+            <div style="margin-bottom: 15px; padding: 10px; border-radius: 5px; background: #e9ecef;">
+                <strong>현재 상태: </strong> 
+                <span id="currentStatusBadge" style="font-weight: bold; padding: 3px 8px; border-radius: 4px; color: white;"></span>
+            </div>
+            
+            <h4>📌 조회된 상세 결과</h4>
             <pre><code id="getAnalysisResultJson"></code></pre>
         </div>
 
@@ -30,11 +35,23 @@
                 const btn = document.getElementById('getAnalysisBtn');
                 
                 btn.disabled = true;
-                btn.textContent = '조회 중...';
+                btn.textContent = '상태 확인 중... 🔄';
 
                 try {
                     const result = await ApiService.get(`${API.ANALYSIS}/${id}`);
                     
+                    // 상태(Status)에 따라 뱃지 색상 변경
+                    const badge = document.getElementById('currentStatusBadge');
+                    badge.textContent = result.status;
+                    if (result.status === 'COMPLETED') {
+                        badge.style.background = '#28a745'; // 초록
+                    } else if (result.status === 'FAILED') {
+                        badge.style.background = '#dc3545'; // 빨강
+                    } else {
+                        badge.style.background = '#ffc107'; // 노랑 (PENDING, SCANNING 등)
+                        badge.style.color = '#333';
+                    }
+
                     document.getElementById('getAnalysisResultJson').textContent = JSON.stringify(result, null, 2);
                     document.getElementById('getAnalysisResultArea').style.display = 'block';
 
@@ -43,7 +60,7 @@
                     alert('오류 발생: ' + error.message);
                 } finally {
                     btn.disabled = false;
-                    btn.textContent = '결과 조회';
+                    btn.textContent = '진행상태 조회';
                 }
             });
         </script>

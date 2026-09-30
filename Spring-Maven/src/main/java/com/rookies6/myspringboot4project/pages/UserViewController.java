@@ -10,29 +10,30 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserViewController {
 
     private final UserService userService;
 
-    // 1. 메인 허브 화면
+    // 1. 메인 허브 화면 (root index.html)
     @GetMapping("/")
     public String index() {
-        return "index";
+        return "index"; // templates/index.html
     }
 
     // 2. 회원 목록 화면
     @GetMapping("/list-users")
     public String listUsers(Model model) {
         model.addAttribute("users", userService.getAllUsers());
-        return "list-users";
+        return "user/list-users"; // templates/user/list-users.html
     }
 
     // 3. 회원 등록 화면
     @GetMapping("/signup")
     public String signup(Model model) {
         model.addAttribute("userForm", new UserDTO.Request());
-        return "signup";
+        return "user/signup"; // templates/user/signup.html
     }
 
     // 4. 회원 등록 처리
@@ -42,18 +43,18 @@ public class UserViewController {
             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return "signup";
+            return "user/signup";
         }
 
         userService.createUser(request);
-        return "redirect:/list-users";
+        return "redirect:/user/list-users";
     }
 
     // 5. 회원 수정 화면
     @GetMapping("/edit-user/{id}")
     public String editUser(Model model, @PathVariable Long id) {
         model.addAttribute("userForm", userService.getUserById(id));
-        return "edit-user";
+        return "user/edit-user"; // templates/user/edit-user.html
     }
 
     // 6. 회원 수정 처리
@@ -63,18 +64,6 @@ public class UserViewController {
             @ModelAttribute("userForm") UserDTO.Request request) {
         
         userService.updateUser(id, request);
-        return "redirect:/list-users";
-    }
-    
-    // 7. API 가이드 화면
-    @GetMapping("/api-guide")
-    public String apiGuide() {
-        return "api-guide";
-    }
-
-    // 8. 코드 보안 분석 화면
-    @GetMapping("/analysis")
-    public String analysis() {
-        return "analysis";
+        return "redirect:/user/list-users";
     }
 }

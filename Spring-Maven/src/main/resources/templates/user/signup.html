@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<!-- 공통 Head 조각 불러오기 -->
+<head th:replace="~{fragments/head :: commonHead('회원 등록')}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar(${projects})}">
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="main-content">
+        <div class="container">
+            <!-- 폼 전용 CSS -->
+            <link rel="stylesheet" th:href="@{/css/signup.css}">
+
+            <div class="header">
+                <h1>회원 등록</h1>
+                <p>새로운 회원의 로그인 정보를 입력합니다.</p>
+            </div>
+
+            <div class="card">
+                <!-- 컨트롤러에서 넘겨준 userForm 객체 사용 -->
+                <form th:action="@{/signup}" th:object="${userForm}" method="post">
+
+                    <fieldset>
+                        <legend>접속 정보</legend>
+                        <div class="form-group">
+                            <label for="email">이메일</label>
+                            <input type="email" id="email" th:field="*{email}" placeholder="example@email.com">
+                            <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">비밀번호</label>
+                            <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 입력하세요">
+                            <span class="error-msg" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                        </div>
+                    </fieldset>
+
+                    <button type="submit" class="execute-button post-button">등록 완료</button>
+
+                </form>
+
+                <div class="back-link">
+                    <a th:href="@{/list-users}">← 목록으로 돌아가기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
