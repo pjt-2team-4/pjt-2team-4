@@ -1,4 +1,6 @@
-# Quick Start Guide
+
+
+# Quick Start Guide - 브런치 : Inchan , 커밋 : ee503b9 직후 기준
 
 ## 1. 데이터베이스 세팅 (Windows CMD)
 
@@ -35,7 +37,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 ```
 
-*(※ DB 연결 거부 에러 발생 시: Windows CMD에서 `ipconfig`로 WSL IP를 재확인하고, Windows 방화벽에서 인바운드 TCP 3306 포트를 허용해야 합니다.)*
+*(※ DB 연결 거부 에러 발생 시: 재부팅 등으로 Windows 호스트의 IP가 변경되었을 수 있습니다. WSL 터미널에서 `cat /etc/resolv.conf | grep nameserver` 명령어를 입력해 출력되는 IP 주소로 `spring.datasource.url`을 수정하세요. 또한 Windows 방화벽에서 인바운드 TCP 3306 포트가 허용되어 있어야 합니다.)*
 
 ## 3. 애플리케이션 빌드 및 실행 (WSL 터미널)
 

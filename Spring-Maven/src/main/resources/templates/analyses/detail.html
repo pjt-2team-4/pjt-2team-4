@@ -60,10 +60,10 @@
         <!-- 관리 액션 (수정된 부분: 새 분석 요청 버튼으로 변경) -->
         <section class="section">
             <div class="card project-actions" style="display: flex; gap: 10px;">
-                <a th:href="@{/analyses/list}" class="execute-button back-button" style="background-color: #6b7280; text-decoration: none;">
+                <a th:href="@{/analyses/new}" class="execute-button back-button" style="background-color: #6b7280; text-decoration: none;">
                     ← 전체 목록으로
                 </a>
-                <a th:href="@{/analyses/${analysis.id}/upload}" class="execute-button post-button" style="text-decoration: none;">
+                <a th:href="@{/analyses/{id}/upload(id=${analysis.id})}" class="execute-button post-button" style="text-decoration: none;">
                     + 새로운 분석 요청하기
                 </a>
             </div>
