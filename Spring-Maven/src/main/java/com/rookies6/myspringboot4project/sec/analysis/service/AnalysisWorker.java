@@ -50,8 +50,7 @@ public class AnalysisWorker {
                     .ruleId("SQLI-001")
                     .vulnerabilityType(VulnerabilityType.SQL_INJECTION) // Enum 직접 사용
                     .severity(Severity.HIGH)                            // Enum 직접 사용
-                    .title("SQL 삽입 취약점")
-                    .description("사용자 입력값이 검증 없이 쿼리에 직접 결합되어 SQL 인젝션 공격에 취약합니다.")
+                    .cweId("CWE-89")
                     .startLine(5)
                     .endLine(5)
                     .codeSnippet("String query = \"SELECT * FROM users WHERE id = \" + userInput;")

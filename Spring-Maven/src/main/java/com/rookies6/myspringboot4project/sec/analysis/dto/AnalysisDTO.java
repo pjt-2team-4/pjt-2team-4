@@ -113,7 +113,6 @@ public class AnalysisDTO {
         private final String typeDisplayName;
         private final String severity;
         private final String severityDisplayName;
-        private final String description;
         private final Integer startLine;
         private final Integer endLine;
         private final String codeSnippet;
@@ -131,8 +130,7 @@ public class AnalysisDTO {
             // Severity Enum 정보 매핑
             this.severity = finding.getSeverity() != null ? finding.getSeverity().name() : null;
             this.severityDisplayName = finding.getSeverity() != null ? finding.getSeverity().getDisplayName() : null;
-            
-            this.description = finding.getDescription();
+
             this.startLine = finding.getStartLine();
             this.endLine = finding.getEndLine();
             this.codeSnippet = finding.getCodeSnippet();

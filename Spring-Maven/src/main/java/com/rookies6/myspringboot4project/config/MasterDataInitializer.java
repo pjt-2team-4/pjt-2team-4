@@ -64,11 +64,9 @@ public class MasterDataInitializer implements CommandLineRunner {
             
             // HARDCODED_SECRET 사용 (MVP 3종 중 하나)
             file1_1.addFinding(FindingVulnerability.builder()
-                    .title("Hardcoded AWS Secret Key")
                     .ruleId("SEC-001")
                     .vulnerabilityType(VulnerabilityType.HARDCODED_SECRET)
                     .severity(Severity.CRITICAL)
-                    .description("소스코드에 AWS Secret Key가 하드코딩되어 있습니다. 환경 변수나 Secret Manager를 사용하세요.")
                     .startLine(2).endLine(2)
                     .codeSnippet("private String awsSecretKey = \"AKIAIOSFODNN7EXAMPLE\";")
                     .build());
@@ -157,11 +155,9 @@ public class MasterDataInitializer implements CommandLineRunner {
             
             // XSS 사용 (MVP 3종 중 하나)
             file4_1.addFinding(FindingVulnerability.builder()
-                    .title("Reflected XSS Vulnerability")
                     .ruleId("SEC-002")
                     .vulnerabilityType(VulnerabilityType.XSS)
                     .severity(Severity.HIGH)
-                    .description("사용자 입력값(keyword)이 적절한 검증이나 인코딩 없이 응답에 포함되어 스크립트가 실행될 수 있습니다.")
                     .startLine(5).endLine(5)
                     .codeSnippet("return \"<div>Result: \" + keyword + \"</div>\";")
                     .build());
