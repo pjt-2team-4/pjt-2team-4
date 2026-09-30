@@ -67,6 +67,7 @@ public class MasterDataInitializer implements CommandLineRunner {
                     .ruleId("SEC-001")
                     .vulnerabilityType(VulnerabilityType.HARDCODED_SECRET)
                     .severity(Severity.CRITICAL)
+                    .cweId("CWE-798")
                     .startLine(2).endLine(2)
                     .codeSnippet("private String awsSecretKey = \"AKIAIOSFODNN7EXAMPLE\";")
                     .build());
@@ -158,6 +159,7 @@ public class MasterDataInitializer implements CommandLineRunner {
                     .ruleId("SEC-002")
                     .vulnerabilityType(VulnerabilityType.XSS)
                     .severity(Severity.HIGH)
+                    .cweId("CWE-79")
                     .startLine(5).endLine(5)
                     .codeSnippet("return \"<div>Result: \" + keyword + \"</div>\";")
                     .build());
