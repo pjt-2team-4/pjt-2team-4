@@ -3,6 +3,7 @@ package com.rookies6.myspringboot4project.sec.analysis.service;
 import com.rookies6.myspringboot4project.exception.BusinessException;
 import com.rookies6.myspringboot4project.exception.ErrorCode;
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisDTO;
+import com.rookies6.myspringboot4project.sec.analysisfile.dto.AnalysisFileDTO;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
@@ -116,28 +117,24 @@ public class AnalysisService {
         return AnalysisDTO.StatusResponse.fromEntity(analysisRequest);
     }
 
-    /**
+/**
      * 특정 분석 ID에 속한 파일 목록 조회
      */
-    public List<AnalysisDTO.FileResponse> getFilesByAnalysisId(Long analysisId) {
+    public List<AnalysisFileDTO.Response> getFilesByAnalysisId(Long analysisId) {
         AnalysisRequest analysisRequest = analysisRequestRepository.findById(analysisId)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", analysisId
                 ));
 
         return analysisRequest.getAnalysisFiles().stream()
-                .map(file -> AnalysisDTO.FileResponse.builder()
-                        .id(file.getId())
-                        .name(file.getFileName())
-                        .relativePath(file.getRelativePath())
-                        .build())
+                .map(AnalysisFileDTO.Response::new) // 생성자를 통해 바로 변환
                 .toList();
     }
 
     /**
      * 특정 분석의 특정 파일 상세 내용 조회
      */
-    public AnalysisDTO.FileDetailResponse getFileDetail(Long analysisId, Long fileId) {
+    public AnalysisFileDTO.DetailResponse getFileDetail(Long analysisId, Long fileId) {
         AnalysisRequest analysisRequest = analysisRequestRepository.findById(analysisId)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", analysisId
@@ -150,11 +147,7 @@ public class AnalysisService {
                         ErrorCode.RESOURCE_NOT_FOUND, "AnalysisFile", "id", fileId
                 ));
 
-        return AnalysisDTO.FileDetailResponse.builder()
-                .id(targetFile.getId())
-                .name(targetFile.getFileName())
-                .content(targetFile.getContent())
-                .build();
+        return new AnalysisFileDTO.DetailResponse(targetFile); // 생성자를 통해 바로 변환
     }
 
     /**

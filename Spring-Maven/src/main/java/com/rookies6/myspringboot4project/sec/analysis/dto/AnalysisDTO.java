@@ -1,6 +1,7 @@
 package com.rookies6.myspringboot4project.sec.analysis.dto;
 
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
+import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
 import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,9 +15,6 @@ import java.util.List;
 
 public class AnalysisDTO {
 
-    /**
-     * 분석 요청
-     */
     @Getter
     @NoArgsConstructor
     public static class Request {
@@ -41,9 +39,6 @@ public class AnalysisDTO {
         }
     }
 
-    /**
-     * 분석 결과
-     */
     @Getter
     public static class Response {
 
@@ -53,12 +48,12 @@ public class AnalysisDTO {
         private final String status;
 
         private final int totalCount;
+        private final long criticalCount;
         private final long highCount;
         private final long mediumCount;
         private final long lowCount;
 
         private final List<VulnerabilityDto> vulnerabilities;
-
         private final LocalDateTime createdAt;
 
         public Response(AnalysisRequest request) {
@@ -73,17 +68,11 @@ public class AnalysisDTO {
 
             this.totalCount = allFindings.size();
 
-            this.highCount = allFindings.stream()
-                    .filter(f -> f.getSeverity() != null && "HIGH".equalsIgnoreCase(f.getSeverity().name()))
-                    .count();
-
-            this.mediumCount = allFindings.stream()
-                    .filter(f -> f.getSeverity() != null && "MEDIUM".equalsIgnoreCase(f.getSeverity().name()))
-                    .count();
-
-            this.lowCount = allFindings.stream()
-                    .filter(f -> f.getSeverity() != null && "LOW".equalsIgnoreCase(f.getSeverity().name()))
-                    .count();
+            // Severity Enum 비교를 통한 데이터 집계
+            this.criticalCount = allFindings.stream().filter(f -> f.getSeverity() == Severity.CRITICAL).count();
+            this.highCount = allFindings.stream().filter(f -> f.getSeverity() == Severity.HIGH).count();
+            this.mediumCount = allFindings.stream().filter(f -> f.getSeverity() == Severity.MEDIUM).count();
+            this.lowCount = allFindings.stream().filter(f -> f.getSeverity() == Severity.LOW).count();
 
             this.vulnerabilities = allFindings.stream()
                     .map(VulnerabilityDto::new)
@@ -97,9 +86,6 @@ public class AnalysisDTO {
         }
     }
 
-    /**
-     * 분석 상태
-     */
     @Getter
     @Builder
     @AllArgsConstructor
@@ -117,9 +103,6 @@ public class AnalysisDTO {
         }
     }
 
-    /**
-     * 취약점 정보
-     */
     @Getter
     public static class VulnerabilityDto {
         private final Long id;
@@ -127,7 +110,9 @@ public class AnalysisDTO {
         private final String fileName;
         private final String ruleId;
         private final String type;
+        private final String typeDisplayName;
         private final String severity;
+        private final String severityDisplayName;
         private final String description;
         private final Integer startLine;
         private final Integer endLine;
@@ -138,42 +123,19 @@ public class AnalysisDTO {
             this.fileId = finding.getAnalysisFile() != null ? finding.getAnalysisFile().getId() : null;
             this.fileName = finding.getAnalysisFile() != null ? finding.getAnalysisFile().getFileName() : null;
             this.ruleId = finding.getRuleId();
-            this.type = finding.getVulnerabilityType();
+            
+            // VulnerabilityType Enum 정보 매핑
+            this.type = finding.getVulnerabilityType() != null ? finding.getVulnerabilityType().name() : null;
+            this.typeDisplayName = finding.getVulnerabilityType() != null ? finding.getVulnerabilityType().getDisplayName() : null;
+            
+            // Severity Enum 정보 매핑
             this.severity = finding.getSeverity() != null ? finding.getSeverity().name() : null;
+            this.severityDisplayName = finding.getSeverity() != null ? finding.getSeverity().getDisplayName() : null;
+            
             this.description = finding.getDescription();
             this.startLine = finding.getStartLine();
             this.endLine = finding.getEndLine();
             this.codeSnippet = finding.getCodeSnippet();
         }
-    }
-
-    // ==========================================
-    // 💡 아래 두 DTO 클래스가 누락되어 추가했습니다.
-    // ==========================================
-
-    /**
-     * 파일 목록 조회용 응답 DTO
-     */
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class FileResponse {
-        private Long id;
-        private String name;
-        private String relativePath;
-    }
-
-    /**
-     * 파일 상세 내용 조회용 응답 DTO
-     */
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class FileDetailResponse {
-        private Long id;
-        private String name;
-        private String content;
     }
 }

@@ -43,10 +43,10 @@ public class AnalysisFile extends BaseEntity {
     private Integer lineCount;
 
     @OneToMany(
-        mappedBy = "analysisFile",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
+            mappedBy = "analysisFile",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     private List<VulnerabilityFinding> findings = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class AnalysisFile extends BaseEntity {
     }
 
     public void addFinding(VulnerabilityFinding finding) {
-        findings.add(finding);
+        this.findings.add(finding);
         finding.assignTo(this);
     }
 }

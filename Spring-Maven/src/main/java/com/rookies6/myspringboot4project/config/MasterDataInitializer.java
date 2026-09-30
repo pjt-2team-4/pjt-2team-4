@@ -6,6 +6,7 @@ import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
 import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
+import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import com.rookies6.myspringboot4project.user.entity.User;
 import com.rookies6.myspringboot4project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,11 +61,12 @@ public class MasterDataInitializer implements CommandLineRunner {
                             "        System.out.println(\"Processing banking...\");\n" +
                             "    }\n" +
                             "}");
-            // 샘플 취약점 추가
+            
+            // HARDCODED_SECRET 사용 (MVP 3종 중 하나)
             file1_1.addFinding(VulnerabilityFinding.builder()
                     .title("Hardcoded AWS Secret Key")
                     .ruleId("SEC-001")
-                    .vulnerabilityType("Hardcoded Credentials")
+                    .vulnerabilityType(VulnerabilityType.HARDCODED_SECRET)
                     .severity(Severity.CRITICAL)
                     .description("소스코드에 AWS Secret Key가 하드코딩되어 있습니다. 환경 변수나 Secret Manager를 사용하세요.")
                     .startLine(2).endLine(2)
@@ -144,31 +146,33 @@ public class MasterDataInitializer implements CommandLineRunner {
                     .build();
 
             AnalysisFile file4_1 = createFile("src/main/java/FileController.java", "FileController.java",
-                    "import java.io.File;\n" +
+                    "import org.springframework.web.bind.annotation.*;\n" +
+                            "@RestController\n" +
                             "public class FileController {\n" +
-                            "    public File download(String fileName) {\n" +
-                            "        // Vulnerable to Path Traversal\n" +
-                            "        return new File(\"/var/uploads/\" + fileName);\n" +
+                            "    @GetMapping(\"/search\")\n" +
+                            "    public String search(@RequestParam String keyword) {\n" +
+                            "        return \"<div>Result: \" + keyword + \"</div>\";\n" +
                             "    }\n" +
                             "}");
+            
+            // XSS 사용 (MVP 3종 중 하나)
             file4_1.addFinding(VulnerabilityFinding.builder()
-                    .title("Path Traversal Vulnerability")
+                    .title("Reflected XSS Vulnerability")
                     .ruleId("SEC-002")
-                    .vulnerabilityType("Path Traversal")
+                    .vulnerabilityType(VulnerabilityType.XSS)
                     .severity(Severity.HIGH)
-                    .description("사용자 입력(fileName)이 검증 없이 파일 경로 생성에 사용되었습니다. '../' 등을 통해 허용되지 않은 디렉토리에 접근할 수 있습니다.")
+                    .description("사용자 입력값(keyword)이 적절한 검증이나 인코딩 없이 응답에 포함되어 스크립트가 실행될 수 있습니다.")
                     .startLine(5).endLine(5)
-                    .codeSnippet("return new File(\"/var/uploads/\" + fileName);")
+                    .codeSnippet("return \"<div>Result: \" + keyword + \"</div>\";")
                     .build());
 
             request4.addFile(file4_1);
 
-            // 4. AnalysisRequest만 저장하면, Cascade 옵션에 의해 Files와 Findings가 자동으로 모두 연쇄 저장됩니다.
+            // 4. 연쇄 저장 처리
             analysisRequestRepository.saveAll(List.of(request1, request2, request3, request4));
         }
     }
 
-    // 연관관계 맵핑(assignTo)은 addFile 메서드 내부에서 처리하므로 여기서는 순수 객체만 리턴합니다.
     private AnalysisFile createFile(String relativePath, String fileName, String content) {
         int lineCount = content.split("\r\n|\r|\n").length;
 
