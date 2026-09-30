@@ -1,7 +1,7 @@
 package com.rookies6.myspringboot4project.sec.scanner.rule;
 
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.rookies6.myspringboot4project.sec.analysis.dto;
 
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.entity.Severity;
-import com.rookies6.myspringboot4project.sec.analysis.entity.VulnerabilityFinding;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.FindingVulnerability;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -62,7 +62,7 @@ public class AnalysisDTO {
             this.language = request.getLanguage();
             this.status = request.getStatus().name();
 
-            List<VulnerabilityFinding> allFindings = request.getAnalysisFiles().stream()
+            List<FindingVulnerability> allFindings = request.getAnalysisFiles().stream()
                     .flatMap(file -> file.getFindings().stream())
                     .toList();
 
@@ -118,7 +118,7 @@ public class AnalysisDTO {
         private final Integer endLine;
         private final String codeSnippet;
 
-        public VulnerabilityDto(VulnerabilityFinding finding) {
+        public VulnerabilityDto(FindingVulnerability finding) {
             this.id = finding.getId();
             this.fileId = finding.getAnalysisFile() != null ? finding.getAnalysisFile().getId() : null;
             this.fileName = finding.getAnalysisFile() != null ? finding.getAnalysisFile().getFileName() : null;
@@ -132,7 +132,8 @@ public class AnalysisDTO {
             this.severity = finding.getSeverity() != null ? finding.getSeverity().name() : null;
             this.severityDisplayName = finding.getSeverity() != null ? finding.getSeverity().getDisplayName() : null;
             
-            this.description = finding.getDescription();
+            // description 필드가 제거되었으므로 빈 값(또는 필요한 대체 값) 처리
+            this.description = ""; 
             this.startLine = finding.getStartLine();
             this.endLine = finding.getEndLine();
             this.codeSnippet = finding.getCodeSnippet();

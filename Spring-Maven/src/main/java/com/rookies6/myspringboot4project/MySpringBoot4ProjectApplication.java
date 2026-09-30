@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing; // 추가
 
-@EnableJpaAuditing // 이 줄을 반드시 추가하세요!
+@EnableJpaAuditing // 이 줄을 반드시 추가
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class MySpringBoot4ProjectApplication {

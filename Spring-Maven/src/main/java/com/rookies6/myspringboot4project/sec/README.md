@@ -1,31 +1,76 @@
 # sec/ 폴더 하위 구조
 
+
+
+## 1. analysis/
 ```md
-
-com.rookies6.myspringboot4project.sec/
-├── project/
-│   ├── controller/   (ProjectController)
-│   ├── service/      (ProjectService)
-│   ├── repository/   (ProjectRepository)
-│   ├── dto/          (ProjectDTO)
-│   └── entity/       (Project)
+analysis/
+├── controller/
+│   └── AnalysisController.java
 │
-├── analysis/
-│   ├── controller/   (AnalysisController)
-│   ├── service/      (AnalysisService)
-│   ├── repository/   (AnalysisRequestRepository 등)
-│   ├── dto/          (AnalysisDTO)
-│   └── entity/       (AnalysisRequest, VulnerabilityFinding 등)
+├── service/
+│   ├── AnalysisWorker.java
+│   └── AnalysisService.java
 │
-└── codefile/
-    ├── controller/   (CodeFileController)
-    ├── service/      (CodeFileService)
-    ├── repository/   (CodeFileRepository)
-    ├── dto/          (CodeFileDTO)
-    └── entity/       (CodeFile)
+├── entity/
+│   ├── AnalysisRequest.java
+│   └── AnalysisStatus.java
+│
+├── repository/
+│   └── AnalysisRequestRepository.java
+│
+└── dto/
+    └── AnalysisDTO.java
+
+```
 
 
-ls -la src/main/java/com/rookies6/myspringboot4project/sec
+## 2. analysisfile/
+```md
+analysisfile/
+├── controller/
+│   └── AnalysisFileController.java
+│
+├── service/
+│   └── AnalysisFileService.java
+│
+├── entity/
+│   └── AnalysisFile.java
+│
+├── repository/
+│   └── AnalysisFileRepository.java
+│
+└── dto/
+    └── AnalysisFileDTO.java
+```
 
+
+## 3. common/enums/
+```md
+sec/common/enums/
+│
+├── FindingStatus.java
+│
+├── FindingVulnerability.java
+│
+├── Language.java
+│
+├── Severity.java
+│
+└── VulnerabilityType.java
+```
+
+
+## 4. scanner/
+```md
+scanner/
+├── SecurityScanner.java
+│
+├── rule/
+│   ├── SecurityRule.java
+│   └── RuleCatalog.java
+│
+└── dto/
+    └── RawFinding.java
 ```
 
