@@ -4,9 +4,6 @@
 
 HELP.md
 target/
-.mvn/
-!.mvn/wrapper/maven-wrapper.jar
-!.mvn/wrapper/maven-wrapper.properties
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -126,6 +123,10 @@ yarn-error.log*
 application-local.yml
 application-local.yaml
 application-local.properties
+application-secrets.yml
+application-secrets.yaml
+application-secrets.properties
+!application-secrets.properties.example
 
 
 # ========================================
