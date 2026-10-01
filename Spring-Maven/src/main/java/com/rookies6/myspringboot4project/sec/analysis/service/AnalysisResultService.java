@@ -7,11 +7,19 @@ import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysisfile.repository.AnalysisFileRepository;
+import com.rookies6.myspringboot4project.sec.analysis.repository.FindingVulnerabilityRepository;
+import com.rookies6.myspringboot4project.sec.common.enums.FindingStatus;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +28,7 @@ public class AnalysisResultService {
 
     private final AnalysisRequestRepository requestRepository;
     private final AnalysisFileRepository fileRepository;
+    private final FindingVulnerabilityRepository findingRepository;
     private final AnalysisProgressStore progressStore;
 
     public AnalysisResultDTO.StatusResponse getStatus(Long analysisId) {
@@ -55,6 +64,76 @@ public class AnalysisResultService {
                 .completedAt(request.getCompletedAt())
                 .recentLogs(snapshot != null ? snapshot.recentLogs() : List.of())
                 .build();
+    }
+
+    /** 7번 — 집계는 GROUP BY 쿼리로 처리, 취약점 전체를 메모리에 올리지 않는다 */
+    public AnalysisResultDTO.SummaryResponse getSummary(Long analysisId) {
+        AnalysisRequest request = requestRepository.findById(analysisId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND,
+                        "분석 요청을 찾을 수 없습니다: " + analysisId));
+
+        // severityCount (IGNORED 제외)
+        Map<Severity, Long> severityMap = toEnumMap(
+                findingRepository.countBySeverity(analysisId, FindingStatus.IGNORED), Severity.class);
+
+        // typeCount (IGNORED 제외, 3개 유형 항상 포함 — 결과 화면 탭용)
+        Map<VulnerabilityType, Long> typeMap = toEnumMap(
+                findingRepository.countByType(analysisId, FindingStatus.IGNORED), VulnerabilityType.class);
+        List<AnalysisResultDTO.TypeCount> typeCount = Arrays.stream(VulnerabilityType.values())
+                .map(type -> AnalysisResultDTO.TypeCount.of(type, typeMap.getOrDefault(type, 0L)))
+                .toList();
+
+        // ruleCount (IGNORED 제외, 건수 많은 순)
+        List<AnalysisResultDTO.RuleCount> ruleCount =
+                findingRepository.countByRule(analysisId, FindingStatus.IGNORED).stream()
+                        .map(row -> new AnalysisResultDTO.RuleCount((String) row[0], (Long) row[1]))
+                        .toList();
+
+        // resolutionRate = RESOLVED / (전체 - IGNORED)
+        Map<FindingStatus, Long> statusMap = toEnumMap(findingRepository.countByStatus(analysisId), FindingStatus.class);
+        long resolved = statusMap.getOrDefault(FindingStatus.RESOLVED, 0L);
+        long countable = statusMap.values().stream().mapToLong(Long::longValue).sum()
+                - statusMap.getOrDefault(FindingStatus.IGNORED, 0L);
+        double resolutionRate = countable == 0 ? 0.0 : (double) resolved / countable;
+
+        Long durationSeconds = (request.getStartedAt() == null || request.getCompletedAt() == null)
+                ? null
+                : Duration.between(request.getStartedAt(), request.getCompletedAt()).toSeconds();
+
+        return AnalysisResultDTO.SummaryResponse.builder()
+                .analysisId(request.getId())
+                .title(request.getTitle())
+                .status(request.getStatus().name())
+                .overallSeverity(highestOf(severityMap))
+                .totalFiles((int) fileRepository.countByAnalysisRequestId(analysisId))
+                .totalFindings(request.getTotalFindings() == null ? 0 : request.getTotalFindings())
+                .severityCount(AnalysisResultDTO.severityCountOf(severityMap))
+                .typeCount(typeCount)
+                .ruleCount(ruleCount)
+                .resolutionRate(resolutionRate)
+                .durationSeconds(durationSeconds)
+                .startedAt(request.getStartedAt())
+                .completedAt(request.getCompletedAt())
+                .build();
+    }
+
+    /** 0건이 아닌 최고 심각도. 없으면 null */
+    private static String highestOf(Map<Severity, Long> severityMap) {
+        for (Severity severity : List.of(Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM, Severity.LOW)) {
+            if (severityMap.getOrDefault(severity, 0L) > 0) {
+                return severity.name();
+            }
+        }
+        return null;
+    }
+
+    /** GROUP BY 결과(Object[] {enum, count})를 EnumMap 으로 변환 */
+    private static <E extends Enum<E>> Map<E, Long> toEnumMap(List<Object[]> rows, Class<E> type) {
+        Map<E, Long> map = new EnumMap<>(type);
+        for (Object[] row : rows) {
+            map.put(type.cast(row[0]), (Long) row[1]);
+        }
+        return map;
     }
 
     private static String stageOf(AnalysisStatus status) {

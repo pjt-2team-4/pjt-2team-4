@@ -19,6 +19,7 @@ import java.util.List;
 public class AnalysisController {
 
     private final AnalysisService analysisService;
+    private final AnalysisResultService analysisResultService;
 
     /**
      * 분석 요청 생성
@@ -52,13 +53,10 @@ public class AnalysisController {
      * GET /api/v1/analyses/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AnalysisDTO.Response> getAnalysisById(
-            @PathVariable Long id) {
-
-        AnalysisDTO.Response response =
-                analysisService.getAnalysisById(id);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<AnalysisResultDTO.SummaryResponse>> getAnalysisById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(
+                analysisResultService.getSummary(id),
+                "분석 결과 요약 조회가 완료되었습니다"));
     }
 
     /**
