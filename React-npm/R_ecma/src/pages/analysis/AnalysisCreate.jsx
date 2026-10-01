@@ -22,15 +22,13 @@ const AnalysisCreate = () => {
         }
     }, [navigate]);
 
-    // 📁 폴더 선택 핸들러 (확장자 필터링 포함)
+    // 📁 폴더 선택 핸들러
     const handleFileChange = async (e) => {
         const selectedFiles = Array.from(e.target.files);
         if (selectedFiles.length === 0) return;
 
-        // 허용할 소스 코드 확장자 목록 (필요에 따라 추가)
         const allowedExtensions = ['.java', '.js', '.jsx', '.ts', '.tsx', '.py', '.html', '.css', '.xml', '.json'];
 
-        // 폴더 내에서 허용된 확장자만 필터링
         const validFiles = selectedFiles.filter(file => {
             const fileName = file.name.toLowerCase();
             return allowedExtensions.some(ext => fileName.endsWith(ext));
@@ -46,7 +44,7 @@ const AnalysisCreate = () => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     resolve({
-                        // 폴더 업로드 시 webkitRelativePath에 전체 경로가 담깁니다 (예: src/main/java/.../App.java)
+                        // 백엔드 DTO(FileRequestDto)의 filePath 매핑
                         filePath: file.webkitRelativePath || file.name,
                         content: event.target.result
                     });
@@ -75,19 +73,21 @@ const AnalysisCreate = () => {
         setIsLoading(true);
 
         try {
-            // 📌 POST /api/v1/analyses (userId 추가 전송)
+            // 📌 POST /api/v1/analyses
             const response = await api.post('/analyses', {
-                userId: currentUser.userId || currentUser.id, // 로그인된 사용자 ID
+                userId: currentUser.userId || currentUser.id,
                 title,
                 language,
                 files
             });
 
+            // 기획서 반영: AnalysisCreateResponseDto의 필드 수신
             const { analysisId, estimatedDurationSeconds } = response.data;
             alert('분석 요청이 정상적으로 등록되었습니다!');
             
             navigate(`/analysis/${analysisId}/loading`, {
-                state: { estimatedDurationSeconds }
+                // 백엔드에서 아직 안 내려줄 경우 기본값 10초 설정
+                state: { estimatedDurationSeconds: estimatedDurationSeconds || 10 }
             });
         } catch (error) {
             console.error('분석 요청 실패:', error);
@@ -131,7 +131,6 @@ const AnalysisCreate = () => {
                 <div className={styles.field}>
                     <label className={styles.label}>소스 코드 폴더 첨부</label>
                     <div className={styles.fileBox}>
-                        {/* 📌 폴더 업로드 핵심 속성: webkitdirectory */}
                         <input 
                             type="file" 
                             webkitdirectory="true" 

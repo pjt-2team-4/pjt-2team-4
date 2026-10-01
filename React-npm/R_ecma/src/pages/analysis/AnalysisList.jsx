@@ -9,7 +9,6 @@ const AnalysisList = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // 1. 분석 목록 불러오기 (GET /api/v1/analyses)
     const fetchAnalyses = async () => {
         setIsLoading(true);
         setError(null);
@@ -28,10 +27,8 @@ const AnalysisList = () => {
         fetchAnalyses();
     }, []);
 
-    // 2. 분석 요청 삭제 처리 (DELETE /api/v1/analyses/{id})
     const handleDelete = async (id, title, e) => {
-        e.stopPropagation(); // 행 클릭 이벤트 전파 방지
-
+        e.stopPropagation(); 
         if (!window.confirm(`'${title}' 분석 기록을 정말 삭제하시겠습니까?`)) {
             return;
         }
@@ -46,7 +43,6 @@ const AnalysisList = () => {
         }
     };
 
-    // 3. 상태(Status)별 배지 스타일 생성 함수
     const renderStatusBadge = (status) => {
         const statusMap = {
             COMPLETED: { label: '완료', color: '#15803d', bgColor: '#f0fdf4', borderColor: '#bbf7d0' },
@@ -55,7 +51,6 @@ const AnalysisList = () => {
             PENDING: { label: '대기 중', color: '#b45309', bgColor: '#fffbeb', borderColor: '#fde68a' },
             FAILED: { label: '실패', color: '#b91c1c', bgColor: '#fef2f2', borderColor: '#fecaca' },
         };
-
         const current = statusMap[status] || { label: status, color: '#475569', bgColor: '#f8fafc', borderColor: '#cbd5e1' };
 
         return (
@@ -74,7 +69,6 @@ const AnalysisList = () => {
         );
     };
 
-    // 4. 상태에 따른 상세/로딩 페이지 라우팅 분기
     const getItemTargetUrl = (item) => {
         if (item.status === 'COMPLETED' || item.status === 'FAILED') {
             return `/analysis/${item.analysisId}`;
@@ -87,7 +81,6 @@ const AnalysisList = () => {
 
     return (
         <div className={styles.container}>
-            {/* 상단 헤더 */}
             <div className={styles.header}>
                 <h2 className={styles.title}>📋 내 분석 요청 히스토리</h2>
                 <Link to="/analysis/new" className={styles.createBtn}>
@@ -95,7 +88,6 @@ const AnalysisList = () => {
                 </Link>
             </div>
 
-            {/* 목록 테이블 영역 */}
             {analyses.length === 0 ? (
                 <div className={styles.emptyState}>
                     <p style={{ fontSize: '16px', marginBottom: '12px' }}>아직 진행한 보안 분석 요청이 없습니다.</p>
@@ -135,9 +127,7 @@ const AnalysisList = () => {
                                             </Link>
                                         </td>
                                         <td>
-                                            <span className={styles.langBadge}>
-                                                {item.language}
-                                            </span>
+                                            <span className={styles.langBadge}>{item.language}</span>
                                         </td>
                                         <td>
                                             {renderStatusBadge(item.status)}
@@ -145,17 +135,17 @@ const AnalysisList = () => {
                                         <td>
                                             {item.status === 'COMPLETED' ? (
                                                 <div style={{ display: 'flex', gap: '8px', fontSize: '12px' }}>
-                                                    {item.criticalCount > 0 && (
+                                                    {(item.criticalCount > 0) && (
                                                         <span style={{ color: '#dc2626', fontWeight: '700' }}>
                                                             Critical: {item.criticalCount}
                                                         </span>
                                                     )}
-                                                    {item.highCount > 0 && (
+                                                    {(item.highCount > 0) && (
                                                         <span style={{ color: '#ea580c', fontWeight: '600' }}>
                                                             High: {item.highCount}
                                                         </span>
                                                     )}
-                                                    {item.totalCount === 0 && (
+                                                    {(item.totalCount === 0 || (!item.criticalCount && !item.highCount && !item.mediumCount && !item.lowCount)) && (
                                                         <span style={{ color: '#16a34a', fontWeight: '600' }}>
                                                             취약점 없음 🎉
                                                         </span>
@@ -167,11 +157,8 @@ const AnalysisList = () => {
                                         </td>
                                         <td style={{ fontSize: '13px', color: '#64748b' }}>
                                             {new Date(item.createdAt).toLocaleString('ko-KR', {
-                                                year: 'numeric',
-                                                month: '2-digit',
-                                                day: '2-digit',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
+                                                year: 'numeric', month: '2-digit', day: '2-digit',
+                                                hour: '2-digit', minute: '2-digit'
                                             })}
                                         </td>
                                         <td style={{ textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>

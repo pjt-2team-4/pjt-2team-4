@@ -20,23 +20,56 @@ public class AnalysisFileService {
     private final AnalysisFileRepository analysisFileRepository;
 
     /**
-     * 1. 특정 분석 요청(AnalysisRequest) ID에 포함된 파일 목록 조회 (용량 최적화용 - content 제외)
+     * 특정 분석에 포함된 파일 목록 조회
+     *
+     * GET /api/v1/analyses/{analysisId}/files
      */
-    public List<AnalysisFileListResponseDto> getFilesByAnalysisRequestId(Long analysisRequestId) {
-        return analysisFileRepository.findByAnalysisRequestId(analysisRequestId)
+    public List<AnalysisFileListResponseDto> getFilesByAnalysisRequestId(
+            Long analysisId
+    ) {
+
+        return analysisFileRepository
+                .findByAnalysisRequestId(analysisId)
                 .stream()
                 .map(AnalysisFileListResponseDto::new)
                 .toList();
     }
 
     /**
-     * 2. 단일 분석 파일 상세 조회 (소스 코드 원문 및 해당 파일의 취약점 목록 포함)
+     * 특정 분석에 포함된 특정 파일 상세 조회
+     *
+     * GET /api/v1/analyses/{analysisId}/files/{fileId}
+     *
+     * analysisId와 fileId가 실제로 연결되어 있는지도 확인한다.
      */
-    public AnalysisFileDetailResponseDto getFileById(Long fileId) {
-        AnalysisFile file = analysisFileRepository.findById(fileId)
+    public AnalysisFileDetailResponseDto getFileById(
+            Long analysisId,
+            Long fileId
+    ) {
+
+        AnalysisFile file = analysisFileRepository
+                .findById(fileId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisFile", "id", fileId
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "AnalysisFile",
+                        "id",
+                        fileId
                 ));
+
+        /*
+         * fileId만 존재하고 analysisId가 다른 경우를 방지한다.
+         */
+        if (file.getAnalysisRequest() == null
+                || !file.getAnalysisRequest().getId().equals(analysisId)) {
+
+            throw new BusinessException(
+                    ErrorCode.RESOURCE_NOT_FOUND,
+                    "AnalysisFile",
+                    "id",
+                    fileId
+            );
+        }
+
         return new AnalysisFileDetailResponseDto(file);
     }
 }

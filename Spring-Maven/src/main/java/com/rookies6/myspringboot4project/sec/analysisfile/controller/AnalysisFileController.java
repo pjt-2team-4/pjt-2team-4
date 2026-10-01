@@ -10,29 +10,47 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/analysis-files")
+@RequestMapping("/api/v1/analyses/{analysisId}/files")
 @RequiredArgsConstructor
 public class AnalysisFileController {
 
     private final AnalysisFileService analysisFileService;
 
     /**
-     * 1. 특정 분석 요청 ID에 속한 전체 파일 목록 조회 (content 제외)
-     * GET /api/v1/analysis-files/request/{requestId}
+     * 특정 분석에 포함된 파일 목록 조회
+     *
+     * GET /api/v1/analyses/{analysisId}/files
+     *
+     * 예:
+     * GET /api/v1/analyses/1/files
      */
-    @GetMapping("/request/{requestId}")
-    public ResponseEntity<List<AnalysisFileListResponseDto>> getFilesByRequestId(@PathVariable Long requestId) {
-        List<AnalysisFileListResponseDto> files = analysisFileService.getFilesByAnalysisRequestId(requestId);
-        return ResponseEntity.ok(files);
+    @GetMapping
+    public ResponseEntity<List<AnalysisFileListResponseDto>> getFiles(
+            @PathVariable Long analysisId
+    ) {
+        return ResponseEntity.ok(
+                analysisFileService.getFilesByAnalysisRequestId(analysisId)
+        );
     }
 
     /**
-     * 2. 단일 분석 파일 상세 조회 (소스 코드 원문 및 취약점 정보 포함)
-     * GET /api/v1/analysis-files/{id}
+     * 특정 분석의 특정 파일 상세 조회
+     *
+     * GET /api/v1/analyses/{analysisId}/files/{fileId}
+     *
+     * 예:
+     * GET /api/v1/analyses/1/files/3
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<AnalysisFileDetailResponseDto> getFileById(@PathVariable Long id) {
-        AnalysisFileDetailResponseDto fileDetail = analysisFileService.getFileById(id);
-        return ResponseEntity.ok(fileDetail);
+    @GetMapping("/{fileId}")
+    public ResponseEntity<AnalysisFileDetailResponseDto> getFile(
+            @PathVariable Long analysisId,
+            @PathVariable Long fileId
+    ) {
+        return ResponseEntity.ok(
+                analysisFileService.getFileById(
+                        analysisId,
+                        fileId
+                )
+        );
     }
 }

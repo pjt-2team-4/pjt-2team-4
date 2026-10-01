@@ -16,7 +16,6 @@ const AnalysisDetail = () => {
     const handleDownloadPdf = async () => {
         try {
             setIsExporting(true);
-
             await downloadPdfReport(
                 'report-content',
                 `보안분석리포트_#${id}.pdf`
@@ -37,16 +36,12 @@ const AnalysisDetail = () => {
 
     return (
         <div className={styles.container}>
-
             {/* 상단 */}
             <div className={styles.header}>
                 <div>
                     <h2>📄 {getFileName(selectedFile)}</h2>
-
                     <div className={styles.filePath}>
-                        {selectedFile.filePath ||
-                            selectedFile.relativePath ||
-                            selectedFile.fileName}
+                        {selectedFile.relativePath || selectedFile.filePath || selectedFile.fileName}
                     </div>
                 </div>
 
@@ -55,45 +50,48 @@ const AnalysisDetail = () => {
                     disabled={isExporting}
                     className={styles.pdfBtn}
                 >
-                    {isExporting
-                        ? 'PDF 생성 중...'
-                        : '📄 PDF 리포트 다운로드'}
+                    {isExporting ? 'PDF 생성 중...' : '📄 PDF 리포트 다운로드'}
                 </button>
             </div>
 
+            {/* =========================
+                발견된 취약점 (Finding Markers)
+            ========================= */}
+            {selectedFile.findingMarkers && selectedFile.findingMarkers.length > 0 && (
+                <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px' }}>
+                    <h3 style={{ fontSize: '15px', color: '#b91c1c', marginTop: 0, marginBottom: '12px' }}>
+                        🚨 발견된 취약점 ({selectedFile.findingMarkers.length}건)
+                    </h3>
+                    <ul style={{ margin: 0, paddingLeft: '20px', color: '#7f1d1d', fontSize: '14px' }}>
+                        {selectedFile.findingMarkers.map((marker, idx) => (
+                            <li key={marker.findingId || idx} style={{ marginBottom: '6px' }}>
+                                <strong>Line {marker.startLine} ~ {marker.endLine}:</strong> [{marker.severity}] {marker.label}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             {/* =========================
                 선택한 파일 코드
             ========================= */}
-            <div
-                id="report-content"
-                className={styles.codeViewer}
-            >
+            <div id="report-content" className={styles.codeViewer}>
                 <div className={styles.codeHeader}>
                     <span>
-                        {selectedFile.filePath ||
-                            selectedFile.relativePath ||
-                            selectedFile.fileName}
+                        {selectedFile.relativePath || selectedFile.filePath || selectedFile.fileName}
                     </span>
                 </div>
-
                 <pre className={styles.codeBlock}>
                     {selectedFile.content || '// 코드 내용이 없습니다.'}
                 </pre>
             </div>
-
         </div>
     );
 };
 
-
 const getFileName = (file) => {
-    const path =
-        file.filePath ||
-        file.relativePath ||
-        file.fileName ||
-        '';
-
+    // API 명세의 relativePath 우선 참조
+    const path = file.relativePath || file.filePath || file.fileName || '';
     return path.split('/').pop();
 };
 

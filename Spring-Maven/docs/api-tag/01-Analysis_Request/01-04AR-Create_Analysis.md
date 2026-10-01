@@ -38,19 +38,19 @@ POST http://localhost:8080/api/v1/analyses
 
 ```
 {
-    "analysisId": 9,
-    "createdAt": "2026-10-01T10:16:08.432142135",
+    "analysisId": 15,
+    "createdAt": "2026-10-01T13:23:17.896108899",
     "criticalCount": 0,
     "files": [
         {
-            "id": 15,
-            "filePath": "repository/StudentDetailRepository.java",
-            "content": "package com.rookies6.myspringboot4project.repository;\n\nimport com.rookies6.myspringboot4project.entity.StudentDetail;\nimport org.springframework.data.jpa.repository.JpaRepository;\n\n@Repository\npublic interface StudentDetailRepository extends JpaRepository<StudentDetail, Long> {\n    Optional<StudentDetail> findByStudentId(Long studentId);\n}"
+            "id": 26,
+            "filePath": "src/main/java/TestController.java",
+            "content": "public class TestController {\n    public String test(String userInput) {\n        String query = \"SELECT * FROM users WHERE id = \" + userInput;\n        return query;\n    }\n}"
         },
         {
-            "id": 16,
-            "filePath": "repository/StudentRepository.java",
-            "content": "package com.rookies6.myspringboot4project.repository;\n\nimport com.rookies6.myspringboot4project.entity.Student;\nimport org.springframework.data.jpa.repository.JpaRepository;\n\n@Repository\npublic interface StudentRepository extends JpaRepository<Student, Long> {\n    boolean existsByStudentNumber(String studentNumber);\n}"
+            "id": 27,
+            "filePath": "src/main/java/TestService.java",
+            "content": "public class TestService {\n    public void execute() {\n        System.out.println(\"test\");\n    }\n}"
         }
     ],
     "highCount": 0,
@@ -58,7 +58,7 @@ POST http://localhost:8080/api/v1/analyses
     "lowCount": 0,
     "mediumCount": 0,
     "status": "PENDING",
-    "title": "가나다",
+    "title": "Postman 보안 분석 테스트",
     "totalCount": 0,
     "vulnerabilities": []
 }

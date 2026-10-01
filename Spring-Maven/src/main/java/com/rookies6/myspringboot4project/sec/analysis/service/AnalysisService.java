@@ -5,15 +5,16 @@ import com.rookies6.myspringboot4project.exception.ErrorCode;
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisRequestDto;
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisResponseDto;
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisStatusResponseDto;
-import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
-import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
-import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
+import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.user.entity.User;
 import com.rookies6.myspringboot4project.user.repository.UserRepository;
+import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -23,114 +24,237 @@ import java.util.List;
 public class AnalysisService {
 
     private final AnalysisRequestRepository analysisRequestRepository;
-    private final UserRepository userRepository; 
+    private final UserRepository userRepository;
     private final AnalysisWorker analysisWorker;
+    private final AnalysisProgressStore progressStore;
+
 
     /**
-     * 1. 전체 분석 히스토리 목록 조회
+     * 전체 분석 목록 조회
      */
     public List<AnalysisResponseDto> getAllAnalyses() {
+
         return analysisRequestRepository.findAll()
                 .stream()
                 .map(AnalysisResponseDto::fromEntity)
                 .toList();
     }
 
+
     /**
-     * 2. ID로 분석 결과 상세 조회
+     * 분석 상세 조회
      */
     public AnalysisResponseDto getAnalysisById(Long id) {
-        AnalysisRequest request = analysisRequestRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
-                ));
+
+        AnalysisRequest request =
+                findAnalysisRequest(id);
+
         return AnalysisResponseDto.fromEntity(request);
     }
 
-    /**
-     * 3. 비동기 스캔 진행 상태 조회
-     */
-    public AnalysisStatusResponseDto getAnalysisStatus(Long id) {
-        AnalysisRequest request = analysisRequestRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
-                ));
-        return AnalysisStatusResponseDto.fromEntity(request);
-    }
 
     /**
-     * 4. 새 분석 요청 생성 및 파일 엔티티 매핑
+     * 분석 진행 상태 조회
+     */
+    public AnalysisStatusResponseDto getAnalysisStatus(
+            Long id
+    ) {
+
+        AnalysisRequest request =
+                findAnalysisRequest(id);
+
+        return AnalysisStatusResponseDto.fromEntity(
+                request,
+                progressStore.getLogs(id)
+        );
+    }
+
+
+    /**
+     * 분석 생성
      */
     @Transactional
-    public AnalysisResponseDto createAnalysis(AnalysisRequestDto requestDto) {
+    public AnalysisResponseDto createAnalysis(
+            AnalysisRequestDto requestDto
+    ) {
 
-        // 📌 1. DB에서 사용자 조회 (user_id 맵핑용)
-        User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "User", "id", requestDto.getUserId()
-                ));
+        // 1. 사용자 확인
+        User user =
+                userRepository.findById(
+                                requestDto.getUserId()
+                        )
+                        .orElseThrow(() ->
+                                new BusinessException(
+                                        ErrorCode.RESOURCE_NOT_FOUND,
+                                        "User",
+                                        "id",
+                                        requestDto.getUserId()
+                                )
+                        );
 
-        // AnalysisRequest 엔티티 생성 (초기 상태: PENDING)
-        AnalysisRequest request = AnalysisRequest.builder()
-                .user(user)
-                .title(requestDto.getTitle())
-                .language(requestDto.getLanguage())
-                .status(AnalysisStatus.PENDING)
-                .build();
 
-        // 첨부 파일 목록 매핑 및 연관관계 설정
-        if (requestDto.getFiles() != null && !requestDto.getFiles().isEmpty()) {
-            List<AnalysisFile> files = requestDto.getFiles().stream()
-                    .map(fileDto -> {
-                        String path = fileDto.getFilePath();
-                        String fileName = path.contains("/") 
-                                ? path.substring(path.lastIndexOf("/") + 1) 
-                                : path;
-                        int lineCount = fileDto.getContent() != null 
-                                ? fileDto.getContent().split("\n").length 
-                                : 0;
+        // 2. 분석 요청 생성
+        AnalysisRequest request =
+                AnalysisRequest.create(
+                        user,
+                        requestDto.getTitle(),
+                        requestDto.getLanguage(),
+                        null
+                );
 
-                        return AnalysisFile.builder()
-                                .fileName(fileName)
-                                .relativePath(path)
-                                .language(requestDto.getLanguage())
-                                .lineCount(lineCount)
-                                .content(fileDto.getContent())
-                                .analysisRequest(request)
-                                .build();
-                    })
-                    .toList();
 
-            request.getAnalysisFiles().addAll(files);
+        // 3. 파일 생성
+        if (requestDto.getFiles() != null) {
+
+            requestDto.getFiles()
+                    .forEach(fileDto -> {
+
+                        String relativePath =
+                                fileDto.getFilePath();
+
+                        String fileName =
+                                extractFileName(
+                                        relativePath
+                                );
+
+                        int lineCount =
+                                calculateLineCount(
+                                        fileDto.getContent()
+                                );
+
+                        AnalysisFile analysisFile =
+                                AnalysisFile.builder()
+                                        .relativePath(relativePath)
+                                        .fileName(fileName)
+                                        .language(
+                                                requestDto.getLanguage()
+                                        )
+                                        .content(fileDto.getContent())
+                                        .lineCount(lineCount)
+                                        .build();
+
+                        request.addFile(
+                                analysisFile
+                        );
+                    });
         }
 
-        AnalysisRequest savedRequest = analysisRequestRepository.save(request);
 
-	analysisWorker.runScannerAndLlmProcess(savedRequest.getId());
+        // 4. 저장
+        AnalysisRequest savedRequest =
+                analysisRequestRepository.save(request);
 
-        return AnalysisResponseDto.fromEntity(savedRequest);
+        Long analysisId =
+                savedRequest.getId();
+
+
+        /*
+         * 5. COMMIT 이후 Worker 실행
+         */
+        TransactionSynchronizationManager
+                .registerSynchronization(
+                        new TransactionSynchronization() {
+
+                            @Override
+                            public void afterCommit() {
+
+                                analysisWorker
+                                        .runScannerAndLlmProcess(
+                                                analysisId
+                                        );
+                            }
+                        }
+                );
+
+
+        return AnalysisResponseDto
+                .fromEntity(savedRequest);
     }
 
+
     /**
-     * 5. 분석 히스토리 삭제
+     * 분석 삭제
      */
     @Transactional
     public void deleteAnalysis(Long id) {
-        if (!analysisRequestRepository.existsById(id)) {
+
+        AnalysisRequest request =
+                findAnalysisRequest(id);
+
+        if (request.isInProgress()) {
+
             throw new BusinessException(
-                    ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
+                    ErrorCode.INVALID_INPUT,
+                    "진행 중인 분석은 삭제할 수 없습니다."
             );
         }
-        analysisRequestRepository.deleteById(id);
+
+        progressStore.remove(id);
+
+        analysisRequestRepository.delete(request);
     }
 
 
-    // 유틸리티 메서드: 경로에서 파일명만 추출
-    private String extractFileName(String filePath) {
-        if (filePath == null) return "unknown";
-        int lastSlash = filePath.lastIndexOf('/');
-        int lastBackslash = filePath.lastIndexOf('\\');
-        int maxIndex = Math.max(lastSlash, lastBackslash);
-        return maxIndex >= 0 ? filePath.substring(maxIndex + 1) : filePath;
+    private AnalysisRequest findAnalysisRequest(
+            Long id
+    ) {
+
+        return analysisRequestRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new BusinessException(
+                                ErrorCode.RESOURCE_NOT_FOUND,
+                                "AnalysisRequest",
+                                "id",
+                                id
+                        )
+                );
+    }
+
+
+    private String extractFileName(
+            String filePath
+    ) {
+
+        if (filePath == null
+                || filePath.isBlank()) {
+
+            return "unknown";
+        }
+
+        int lastSlash =
+                filePath.lastIndexOf('/');
+
+        int lastBackslash =
+                filePath.lastIndexOf('\\');
+
+        int lastSeparator =
+                Math.max(
+                        lastSlash,
+                        lastBackslash
+                );
+
+        return lastSeparator >= 0
+                ? filePath.substring(
+                        lastSeparator + 1
+                )
+                : filePath;
+    }
+
+
+    private int calculateLineCount(
+            String content
+    ) {
+
+        if (content == null
+                || content.isEmpty()) {
+
+            return 0;
+        }
+
+        return content.split(
+                "\\R",
+                -1
+        ).length;
     }
 }
