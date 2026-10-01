@@ -102,10 +102,6 @@ public class AnalysisRequest extends BaseEntity {
     // [핵심] AnalysisWorker 및 서비스에서 호출하는 상태 변경 / 비즈니스 메서드들
     // =========================================================================
 
-    public void updateStatus(AnalysisStatus status) {
-        this.status = status;
-    }
-
     public void updateStatus(String statusStr) {
         this.status = AnalysisStatus.valueOf(statusStr);
     }

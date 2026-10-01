@@ -188,25 +188,6 @@ public class FindingDTO {
         }
     }
 
-    // ───────────── 14번 상태 변경 ─────────────
-    @Getter
-    @NoArgsConstructor
-    public static class StatusUpdateRequest {
-        @NotNull(message = "변경할 상태는 필수입니다.")
-        private FindingStatus status;   // OPEN / RESOLVED / IGNORED
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class StatusUpdateResponse {
-        private final Long findingId;
-        private final String status;
-
-        public static StatusUpdateResponse from(FindingVulnerability f) {
-            return new StatusUpdateResponse(f.getId(), f.getStatus().name());
-        }
-    }
-
     // ───────────── 헬퍼 ─────────────
     private static SecurityRule findRule(String ruleId) {
         try {
