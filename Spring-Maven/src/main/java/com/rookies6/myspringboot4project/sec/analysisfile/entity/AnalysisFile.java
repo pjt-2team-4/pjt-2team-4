@@ -4,19 +4,15 @@ import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.common.enums.FindingVulnerability;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Entity
 @Table(name = "analysis_files")
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AnalysisFile extends BaseEntity {
@@ -45,6 +41,7 @@ public class AnalysisFile extends BaseEntity {
     @Column(name = "line_count", nullable = false)
     private Integer lineCount;
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "analysisFile",
             cascade = CascadeType.ALL,
@@ -53,20 +50,15 @@ public class AnalysisFile extends BaseEntity {
     )
     private List<FindingVulnerability> findings = new ArrayList<>();
 
-    @Builder
-    public AnalysisFile(String relativePath, String fileName, String language, String content, Integer lineCount) {
-        this.relativePath = relativePath;
-        this.fileName = fileName;
-        this.language = language;
-        this.content = content;
-        this.lineCount = lineCount != null ? lineCount : 0;
-    }
-
     public void assignTo(AnalysisRequest analysisRequest) {
         this.analysisRequest = analysisRequest;
     }
 
     public void addFinding(FindingVulnerability finding) {
+        if (this.findings == null) {
+            this.findings = new ArrayList<>();
+        }
+
         this.findings.add(finding);
         finding.assignTo(this);
     }

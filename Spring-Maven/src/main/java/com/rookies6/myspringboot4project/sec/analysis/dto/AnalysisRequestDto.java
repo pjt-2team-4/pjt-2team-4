@@ -1,7 +1,8 @@
 package com.rookies6.myspringboot4project.sec.analysis.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,16 +16,14 @@ import java.util.List;
 @Builder
 public class AnalysisRequestDto {
 
-    @NotNull(message = "사용자 ID는 필수입니다.") // 📌 유저 ID 추가
-    private Long userId;
-
     @NotBlank(message = "분석 제목(Title)은 필수입니다.")
     private String title;
 
     @NotBlank(message = "언어 설정은 필수입니다.")
     private String language;
 
-    @NotNull(message = "분석할 파일 목록은 필수입니다.")
+    @NotEmpty(message = "분석할 파일 목록은 필수입니다.")
+    @Valid
     private List<FileRequestDto> files;
 
     @Getter

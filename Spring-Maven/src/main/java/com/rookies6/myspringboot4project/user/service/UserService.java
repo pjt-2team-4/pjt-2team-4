@@ -5,11 +5,15 @@ import com.rookies6.myspringboot4project.user.entity.User;
 import com.rookies6.myspringboot4project.exception.BusinessException;
 import com.rookies6.myspringboot4project.exception.ErrorCode;
 import com.rookies6.myspringboot4project.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 1. 전체 유저 조회
     public List<UserDTO.Response> getAllUsers() {
@@ -83,36 +88,46 @@ public class UserService {
 
     // 5. 유저 정보 수정
     @Transactional
-    public UserDTO.Response updateUser(Long id, UserDTO.Request request) {
+public UserDTO.Response updateUser(
+        Long id,
+        UserDTO.Request request
+) {
 
-        // 기존 유저 조회
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new BusinessException(
-                                ErrorCode.RESOURCE_NOT_FOUND,
-                                "User",
-                                "id",
-                                id
-                        )
-                );
-
-        // 변경하려는 이메일이 기존과 다를 경우에만 중복 검사
-        if (!user.getEmail().equals(request.getEmail())
-                && userRepository.existsByEmail(request.getEmail())) {
-
-            throw new BusinessException(
-                    ErrorCode.EMAIL_DUPLICATE,
-                    request.getEmail()
+    User user = userRepository
+            .findById(id)
+            .orElseThrow(() ->
+                    new BusinessException(
+                            ErrorCode.RESOURCE_NOT_FOUND,
+                            "User",
+                            "id",
+                            id
+                    )
             );
-        }
 
-        // 유저 정보 수정 (JPA Dirty Checking으로 자동 업데이트)
-        user.changeEmail(request.getEmail());
-        user.changePassword(request.getPassword());
+    String email = request.getEmail()
+            .trim()
+            .toLowerCase();
 
-        return UserDTO.Response.fromEntity(user);
+    if (!user.getEmail().equals(email)
+            && userRepository.existsByEmail(email)) {
+
+        throw new BusinessException(
+                ErrorCode.EMAIL_DUPLICATE,
+                email
+        );
     }
+
+    user.changeEmail(email);
+
+    user.changePassword(
+            passwordEncoder.encode(
+                    request.getPassword()
+            )
+    );
+
+    return UserDTO.Response.fromEntity(user);
+}
+
 
     // 6. 유저 삭제
     @Transactional
@@ -130,23 +145,5 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    // 7. 로그인 처리
-    public UserDTO.Response login(UserDTO.LoginRequest request) {
-        // 1. 이메일로 유저 조회
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND,
-                        "User",
-                        "email",
-                        request.getEmail()
-                ));
-
-        // 2. 비밀번호 일치 여부 확인
-        if (!user.getPassword().equals(request.getPassword())) {
-            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
-        }
-
-        // 3. 로그인 성공 시 응답 DTO 반환
-        return UserDTO.Response.fromEntity(user);
-    }
+  
 }
