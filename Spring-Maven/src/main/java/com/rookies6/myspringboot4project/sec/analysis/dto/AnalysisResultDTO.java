@@ -16,6 +16,12 @@ import java.util.Map;
 
 
 public class AnalysisResultDTO {
+    /** POST /api/v1/analyses - 접수 시점의 응답 */
+    public record AcceptedResponse(Long analysisId, String title, String status,
+                                   int totalFiles, int estimatedDurationSeconds,
+                                   LocalDateTime createdAt) {
+    }
+
     @Getter
     @Builder
     // API 명세서 4.1.2 반영해서 필드 추가해놧음

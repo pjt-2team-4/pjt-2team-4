@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Map;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,6 +15,7 @@ public class ErrorObject {
     private Integer statusCode;
     private String errorCode;
     private String message;
+    private Map<String, String> fieldErrors;
     private String timestamp;
 
     public String getTimestamp() {

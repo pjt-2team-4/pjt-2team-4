@@ -21,13 +21,18 @@ public class AnalysisDTO {
     public static class Request {
 
         @NotBlank(message = "분석 제목(Title)은 필수입니다.")
+        @Size(max = 100)
         private String title;
 
         private String language;
 
-        @NotNull(message = "분석할 파일 목록은 필수입니다.")
-        @Size(min = 1, max = 20)
-        private List<@Valid FileRequest> files;
+        private List<@NotNull @Valid FileRequest> files;
+
+        private ScanOptions scanOptions;
+
+        public record ScanOptions(Boolean detectSqlInjection, Boolean detectHardcodedSecret,
+                                  Boolean detectXss) {
+        }
 
         @Getter
         @NoArgsConstructor

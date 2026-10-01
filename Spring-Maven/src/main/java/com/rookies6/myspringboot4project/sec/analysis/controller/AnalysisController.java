@@ -27,13 +27,14 @@ public class AnalysisController {
      * POST /api/v1/analyses
      */
     @PostMapping
-    public ResponseEntity<AnalysisDTO.Response> createAnalysis(
+    public ResponseEntity<ApiResponse<AnalysisResultDTO.AcceptedResponse>> createAnalysis(
             @Valid @RequestBody AnalysisDTO.Request request) {
 
-        AnalysisDTO.Response response =
+        AnalysisResultDTO.AcceptedResponse response =
                 analysisService.analyzeCode(request);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(ApiResponse.success(response, "분석 요청이 접수되었습니다"));
     }
 
     /**

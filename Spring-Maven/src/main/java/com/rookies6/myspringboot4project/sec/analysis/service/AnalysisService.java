@@ -19,11 +19,16 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisResultDTO;
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
+import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -39,34 +44,46 @@ public class AnalysisService {
      * 분석 요청
      */
     @Transactional
-    public AnalysisDTO.Response analyzeCode(AnalysisDTO.Request request) {
+    public AnalysisResultDTO.AcceptedResponse analyzeCode(AnalysisDTO.Request request) {
+        List<AnalysisDTO.Request.FileRequest> targetFiles = request.getFiles();
+        if (targetFiles == null || targetFiles.isEmpty()) {
+            throw new BusinessException(ErrorCode.EMPTY_FILE_LIST);
+        }
+        if (targetFiles.size() > 20) {
+            throw new BusinessException(ErrorCode.FILE_COUNT_EXCEEDED);
+        }
 
-        // 1. 사용자 조회
+        Map<Language, Integer> languageCounts = new LinkedHashMap<>();
+        Set<String> paths = new HashSet<>();
+        long totalBytes = 0;
+        for (AnalysisDTO.Request.FileRequest fileReq : targetFiles) {
+            String path = fileReq.getRelativePath();
+            if (!paths.add(path)) {
+                throw new BusinessException(ErrorCode.DUPLICATE_FILE_PATH);
+            }
+            int fileBytes = fileReq.getContent().getBytes(StandardCharsets.UTF_8).length;
+            if (fileBytes > 100 * 1024) {
+                throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
+            }
+            totalBytes += fileBytes;
+            if (totalBytes > 500 * 1024) {
+                throw new BusinessException(ErrorCode.CODE_SIZE_EXCEEDED);
+            }
+            Language language = Language.fromFileName(path);
+            if (!language.isSupported()) {
+                int dot = path.lastIndexOf('.');
+                String extension = dot < 0 ? path : path.substring(dot);
+                throw new BusinessException(ErrorCode.UNSUPPORTED_LANGUAGE,
+                        ErrorCode.UNSUPPORTED_LANGUAGE.getMessage(extension));
+            }
+            languageCounts.merge(language, 1, Integer::sum);
+        }
+
+        // 인증 연동 전까지 기존 사용자 선택 방식은 유지한다.
         User user = userRepository.findById(1L)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.RESOURCE_NOT_FOUND, "User", "id", 1L
                 ));
-
-        // 2. 파일별 언어 중 가장 많은 언어를 대표 언어로 사용
-        List<AnalysisDTO.Request.FileRequest> targetFiles = request.getFiles();
-
-        if (targetFiles == null || targetFiles.isEmpty()) {
-            throw new BusinessException(
-                    ErrorCode.INVALID_INPUT, "분석할 파일이 존재하지 않습니다."
-            );
-        }
-
-        Map<Language, Integer> languageCounts = new LinkedHashMap<>();
-        for (AnalysisDTO.Request.FileRequest fileReq : targetFiles) {
-            Language language = Language.fromFileName(fileReq.getRelativePath());
-            if (!language.isSupported()) {
-                throw new BusinessException(
-                        ErrorCode.INVALID_INPUT,
-                        "지원하지 않는 파일 형식입니다: " + fileReq.getRelativePath()
-                );
-            }
-            languageCounts.merge(language, 1, Integer::sum);
-        }
 
         Language primaryLanguage = null;
         int maxCount = 0;
@@ -77,11 +94,12 @@ public class AnalysisService {
             }
         }
 
+        int estimatedDurationSeconds = targetFiles.size() * 20;
         AnalysisRequest analysisRequest = AnalysisRequest.create(
                 user,
                 request.getTitle(),
                 primaryLanguage.name(),
-                30 // estimatedDurationSeconds
+                null
         );
 
         // 3. 클라이언트가 보낸 파일 데이터를 AnalysisFile로 변환하여 추가
@@ -111,18 +129,36 @@ public class AnalysisService {
         log.info("분석 요청 생성 완료. analysisId={}", savedRequest.getId());
 
         // 5. 비동기 분석 시작
-//        analysisWorker.runAnalysisPipeline(savedRequest.getId());
         Long analysisId = savedRequest.getId();
+        Set<VulnerabilityType> enabledTypes = enabledTypes(request.getScanOptions());
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        analysisWorker.runAnalysisPipeline(analysisId);
+                        analysisWorker.runAnalysisPipeline(analysisId, enabledTypes);
                     }
                 });
 
         // 6. 즉시 응답
-        return AnalysisDTO.Response.fromEntity(savedRequest);
+        return new AnalysisResultDTO.AcceptedResponse(
+                savedRequest.getId(), savedRequest.getTitle(), savedRequest.getStatus().name(),
+                targetFiles.size(), estimatedDurationSeconds, savedRequest.getCreatedAt());
+    }
+
+    private static Set<VulnerabilityType> enabledTypes(AnalysisDTO.Request.ScanOptions options) {
+        EnumSet<VulnerabilityType> types = EnumSet.allOf(VulnerabilityType.class);
+        if (options != null) {
+            if (Boolean.FALSE.equals(options.detectSqlInjection())) {
+                types.remove(VulnerabilityType.SQL_INJECTION);
+            }
+            if (Boolean.FALSE.equals(options.detectHardcodedSecret())) {
+                types.remove(VulnerabilityType.HARDCODED_SECRET);
+            }
+            if (Boolean.FALSE.equals(options.detectXss())) {
+                types.remove(VulnerabilityType.XSS);
+            }
+        }
+        return Set.copyOf(types);
     }
 
     /**
