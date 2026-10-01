@@ -4,6 +4,8 @@ import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import com.rookies6.myspringboot4project.sec.common.enums.LlmAnalysisStatus;
 import com.rookies6.myspringboot4project.sec.common.enums.LlmVerdict;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,6 +47,8 @@ public class LlmAnalysis extends BaseEntity {
     @Column(length = 20)
     private LlmVerdict verdict;
 
+    @Min(0)
+    @Max(100)
     @Column
     private Integer confidence;
 
@@ -69,9 +73,13 @@ public class LlmAnalysis extends BaseEntity {
     /** LLM 호출 전 자리만 만들어 둘 때 사용 (후속 LLM 연동 이슈) */
     public static LlmAnalysis pending(FindingVulnerability finding) {
         LlmAnalysis analysis = new LlmAnalysis();
-        analysis.finding = finding;
         analysis.status = LlmAnalysisStatus.PENDING;
+        finding.attachLlmAnalysis(analysis);
         return analysis;
+    }
+
+    void assignTo(FindingVulnerability finding) {
+        this.finding = finding;
     }
 
     public boolean isSuccess() {

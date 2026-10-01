@@ -4,6 +4,7 @@ import com.rookies6.myspringboot4project.common.dto.ApiResponse;
 import com.rookies6.myspringboot4project.sec.analysis.dto.FindingDTO;
 import com.rookies6.myspringboot4project.sec.analysis.service.FindingService;
 import com.rookies6.myspringboot4project.sec.common.enums.FindingStatus;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,20 @@ public class FindingController {
 
     private final FindingService findingService;
 
-    /** 12. GET /api/v1/analyses/{analysisId}/findings?type=&ruleId=&status= */
+    /** 12. GET /api/v1/analyses/{analysisId}/findings */
     @GetMapping("/analyses/{analysisId}/findings")
-    public ResponseEntity<ApiResponse<List<FindingDTO.ListItem>>> getFindings(
+    public ResponseEntity<ApiResponse<FindingDTO.ListResponse>> getFindings(
             @PathVariable Long analysisId,
             @RequestParam(required = false) VulnerabilityType type,
             @RequestParam(required = false) String ruleId,
-            @RequestParam(required = false) FindingStatus status) {
+            @RequestParam(required = false) FindingStatus status,
+            @RequestParam(required = false) List<Severity> severity,
+            @RequestParam(required = false) Long fileId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
         return ResponseEntity.ok(ApiResponse.success(
-                findingService.getFindings(analysisId, type, ruleId, status),
+                findingService.getFindings(analysisId, type, ruleId, status,
+                        severity, fileId, page, size),
                 "취약점 목록 조회가 완료되었습니다"));
     }
 

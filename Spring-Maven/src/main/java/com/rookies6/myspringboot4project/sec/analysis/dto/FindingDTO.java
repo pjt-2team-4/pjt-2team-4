@@ -11,6 +11,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * 취약점 응답 DTO.
@@ -19,6 +20,12 @@ import java.util.List;
 public class FindingDTO {
 
     private static final int SUMMARY_LENGTH = 120;
+
+    public record ListResponse(List<ListItem> content, PageInfo page) {
+    }
+
+    public record PageInfo(int number, int size, long totalElements, int totalPages) {
+    }
 
     // ───────────── 12번 목록 ─────────────
     @Getter
@@ -93,12 +100,14 @@ public class FindingDTO {
         public static Detail from(FindingVulnerability f) {
             AnalysisFile file = f.getAnalysisFile();
             LlmAnalysis llm = f.getLlmAnalysis();
+            SecurityRule rule = findRule(f.getRuleId());
+            String beforeCode = file.extractSnippet(f.getStartLine(), f.getEndLine());
 
             return Detail.builder()
                     .findingId(f.getId())
                     .analysisId(file.getAnalysisRequest().getId())
                     .file(new FileInfo(file.getId(), file.getRelativePath(), file.getLanguage()))
-                    .detection(Detection.of(findRule(f.getRuleId()), f.getRuleId(), f.getCodeSnippet()))
+                    .detection(Detection.of(rule, f.getRuleId(), matchedText(rule, beforeCode)))
                     .vulnerabilityType(f.getVulnerabilityType().name())
                     .displayName(f.getVulnerabilityType().getDisplayName())
                     .cweId(f.getCweId())
@@ -107,7 +116,7 @@ public class FindingDTO {
                     .startLine(f.getStartLine())
                     .endLine(f.getEndLine())
                     .llmAnalysis(LlmAnalysisDto.from(llm))
-                    .beforeCode(CodeBlock.of(f.getStartLine(), f.getCodeSnippet()))
+                    .beforeCode(CodeBlock.of(f.getStartLine(), beforeCode))
                     .afterCode(llm == null ? null : CodeBlock.of(f.getStartLine(), llm.getFixedCode()))
                     .build();
         }
@@ -194,11 +203,19 @@ public class FindingDTO {
         }
     }
 
+    private static String matchedText(SecurityRule rule, String code) {
+        if (rule == null) {
+            return code;
+        }
+        Matcher matcher = rule.getPattern().matcher(code);
+        return matcher.find() ? matcher.group() : code;
+    }
+
     private static String summarize(LlmAnalysis llm) {
         if (llm == null || llm.getExplanation() == null) {
             return null;
         }
         String text = llm.getExplanation();
-        return text.length() <= SUMMARY_LENGTH ? text : text.substring(0, SUMMARY_LENGTH) + "...";
+        return text.length() <= SUMMARY_LENGTH ? text : text.substring(0, SUMMARY_LENGTH);
     }
 }

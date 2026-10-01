@@ -106,7 +106,7 @@ public class AnalysisResultService {
                 .status(request.getStatus().name())
                 .overallSeverity(highestOf(severityMap))
                 .totalFiles((int) fileRepository.countByAnalysisRequestId(analysisId))
-                .totalFindings(request.getTotalFindings() == null ? 0 : request.getTotalFindings())
+                .totalFindings(Math.toIntExact(countable))
                 .severityCount(AnalysisResultDTO.severityCountOf(severityMap))
                 .typeCount(typeCount)
                 .ruleCount(ruleCount)

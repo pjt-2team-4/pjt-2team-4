@@ -7,12 +7,14 @@ import com.rookies6.myspringboot4project.sec.analysis.entity.FindingVulnerabilit
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
 import com.rookies6.myspringboot4project.sec.analysis.repository.FindingVulnerabilityRepository;
 import com.rookies6.myspringboot4project.sec.common.enums.FindingStatus;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -25,22 +27,33 @@ public class FindingService {
 
     // TODO: 예빈님 인증 머지 후 소유권 검사(본인 분석만 조회) 추가
 
-    /** 12번 — 심각도 높은 순, 같은 심각도는 파일 경로·라인 순 */
-    public List<FindingDTO.ListItem> getFindings(Long analysisId, VulnerabilityType type,
-                                                 String ruleId, FindingStatus status) {
+    /** 12번 — 파일 경로·라인 순으로 페이지 조회 */
+    public FindingDTO.ListResponse getFindings(Long analysisId, VulnerabilityType type,
+                                               String ruleId, FindingStatus status,
+                                               List<Severity> severities, Long fileId,
+                                               int page, int size) {
+        if (page < 0 || size < 1 || size > 50) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "page는 0 이상, size는 1~50이어야 합니다.");
+        }
         if (!requestRepository.existsById(analysisId)) {
             throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "분석 요청을 찾을 수 없습니다: " + analysisId);
         }
-        return findingRepository.findAllByAnalysisId(analysisId, type, ruleId, status).stream()
-                .sorted(Comparator.comparingInt((FindingVulnerability f) -> f.getSeverity().getWeight()).reversed())
+        List<Severity> selectedSeverities = severities == null || severities.isEmpty()
+                ? List.of(Severity.values()) : List.copyOf(severities);
+        Page<FindingVulnerability> result = findingRepository.findAllByAnalysisId(
+                analysisId, type, ruleId, status, fileId, selectedSeverities,
+                PageRequest.of(page, size));
+        List<FindingDTO.ListItem> content = result.getContent().stream()
                 .map(FindingDTO.ListItem::from)
                 .toList();
+        return new FindingDTO.ListResponse(content, new FindingDTO.PageInfo(
+                result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages()));
     }
 
     /** 13번 */
     public FindingDTO.Detail getFinding(Long findingId) {
         FindingVulnerability finding = findingRepository.findDetailById(findingId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "취약점을 찾을 수 없습니다: " + findingId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.FINDING_NOT_FOUND));
         return FindingDTO.Detail.from(finding);
     }
 }

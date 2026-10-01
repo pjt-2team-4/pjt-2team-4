@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class DefaultExceptionAdvice {
         ErrorCode errorCode = ex.getErrorCode();
         ErrorObject errorObject = new ErrorObject();
         errorObject.setStatusCode(errorCode.getHttpStatus().value());
+        errorObject.setErrorCode(errorCode.name());
         errorObject.setMessage(ex.getMessage());
 
         log.error("{} : {}", errorCode.name(), errorCode.getMessage(), ex);
@@ -63,11 +65,21 @@ public class DefaultExceptionAdvice {
     protected ResponseEntity<ErrorObject> handleException(RuntimeException e) {
         ErrorObject errorObject = new ErrorObject();
         errorObject.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorObject.setErrorCode(ErrorCode.INTERNAL_SERVER_ERROR.name());
         errorObject.setMessage(e.getMessage());
 
         log.error(e.getMessage(), e);
 
         return new ResponseEntity<ErrorObject>(errorObject, HttpStatusCode.valueOf(500));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ErrorObject> handleInvalidQueryParameter(MethodArgumentTypeMismatchException e) {
+        ErrorObject errorObject = new ErrorObject();
+        errorObject.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        errorObject.setErrorCode(ErrorCode.INVALID_INPUT.name());
+        errorObject.setMessage("올바르지 않은 요청 파라미터입니다: " + e.getName());
+        return ResponseEntity.badRequest().body(errorObject);
     }
 
     //입력항목 검증할때 오류 발생할때 동작하는 메서드

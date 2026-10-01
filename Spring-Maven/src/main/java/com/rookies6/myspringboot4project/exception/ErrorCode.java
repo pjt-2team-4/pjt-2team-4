@@ -11,6 +11,11 @@ public enum ErrorCode {
             HttpStatus.NOT_FOUND
     ),
 
+    FINDING_NOT_FOUND(
+            "취약점을 찾을 수 없습니다",
+            HttpStatus.NOT_FOUND
+    ),
+
     STUDENT_NUMBER_DUPLICATE(
             "이미 존재하는 학번입니다: %s",
             HttpStatus.CONFLICT

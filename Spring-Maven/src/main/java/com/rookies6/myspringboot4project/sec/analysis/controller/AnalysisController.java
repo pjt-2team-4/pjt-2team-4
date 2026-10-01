@@ -2,6 +2,7 @@ package com.rookies6.myspringboot4project.sec.analysis.controller;
 
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisDTO;
 import com.rookies6.myspringboot4project.sec.analysis.service.AnalysisService;
+import com.rookies6.myspringboot4project.sec.analysis.service.AnalysisResultService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
