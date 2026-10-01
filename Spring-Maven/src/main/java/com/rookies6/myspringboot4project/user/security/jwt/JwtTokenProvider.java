@@ -1,6 +1,7 @@
 package com.rookies6.myspringboot4project.user.security.jwt;
 
 import com.rookies6.myspringboot4project.user.entity.User;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -35,6 +36,24 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now.getTime() + accessExpirationMs)) // 토큰 만료 시각
                 .signWith(key, SignatureAlgorithm.HS256) // 토큰 서명
                 .compact();
+    }
+
+    // 2. 토큰 검증 메서드
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    // 토큰에서 이메일 추출하는 메서드
+    public String getEmailFromToken(String token) {
+        return Jwts.parser().setSigningKey(key).build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
 }
