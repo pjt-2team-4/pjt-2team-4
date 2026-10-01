@@ -1,15 +1,23 @@
 package com.rookies6.myspringboot4project.user.service;
 
+import com.rookies6.myspringboot4project.config.userinfo.UserInfoUserDetails;
+import com.rookies6.myspringboot4project.user.dto.LoginDTO;
 import com.rookies6.myspringboot4project.user.dto.SignupDTO;
 import com.rookies6.myspringboot4project.exception.BusinessException;
 import com.rookies6.myspringboot4project.exception.ErrorCode;
 import com.rookies6.myspringboot4project.user.entity.User;
 import com.rookies6.myspringboot4project.user.repository.UserRepository;
+import com.rookies6.myspringboot4project.user.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+
 
     @Override
     @Transactional
@@ -47,4 +58,16 @@ public class AuthServiceImpl implements AuthService{
             );
         }
     }
+
+    @Override
+    public LoginDTO.Response login(LoginDTO.Request request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        User user = ((UserInfoUserDetails) Objects.requireNonNull(authentication.getPrincipal())).getUser(); // getUser() 메서드 필요
+        String accessToken = jwtTokenProvider.generateAccessToken(user);
+
+        return LoginDTO.Response.of(accessToken, jwtTokenProvider.getAccessExpirationSeconds());
+    }
+
 }

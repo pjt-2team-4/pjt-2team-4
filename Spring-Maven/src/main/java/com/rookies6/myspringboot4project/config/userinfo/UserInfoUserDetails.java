@@ -1,6 +1,7 @@
 package com.rookies6.myspringboot4project.config.userinfo;
 
 import com.rookies6.myspringboot4project.user.entity.User;
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ public class UserInfoUserDetails implements UserDetails {
 
     private String email;
     private String password;
+    @Getter
     private User user;
 
     public UserInfoUserDetails(User user) {
@@ -33,10 +35,6 @@ public class UserInfoUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return this.email;
-    }
-
-    public User user() {
-        return user;
     }
 
     @Override
