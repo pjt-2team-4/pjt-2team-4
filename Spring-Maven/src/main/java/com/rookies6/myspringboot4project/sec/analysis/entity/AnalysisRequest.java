@@ -3,6 +3,8 @@ package com.rookies6.myspringboot4project.sec.analysis.entity;
 import com.rookies6.myspringboot4project.common.entity.BaseEntity;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.user.entity.User;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,6 +38,10 @@ public class AnalysisRequest extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private AnalysisStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "overall_severity", length = 20)
+    private Severity overallSeverity;
 
     @Column(name = "estimated_duration_seconds")
     private Integer estimatedDurationSeconds;
@@ -139,11 +145,13 @@ public class AnalysisRequest extends BaseEntity {
         this.startedAt = LocalDateTime.now();
     }
 
-    public void complete(int totalFindings) {
-        if (this.status != AnalysisStatus.SCANNING && this.status != AnalysisStatus.EXPLAINING) {
+    public void complete(int totalFindings, Severity overallSeverity) {
+        if (this.status != AnalysisStatus.SCANNING
+                && this.status != AnalysisStatus.EXPLAINING) {
             throw new IllegalStateException("진행 중인 분석만 완료할 수 있습니다. 현재: " + this.status);
         }
         this.totalFindings = totalFindings;
+        this.overallSeverity = overallSeverity;
         this.status = AnalysisStatus.COMPLETED;
         this.completedAt = LocalDateTime.now();
     }

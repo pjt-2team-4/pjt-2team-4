@@ -5,6 +5,8 @@ import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequest
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.sec.analysisfile.repository.AnalysisFileRepository;
 import com.rookies6.myspringboot4project.sec.scanner.dto.RawFinding;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +51,8 @@ public class AnalysisStateService {
     }
 
     @Transactional
-    public void complete(Long analysisId, int totalFindings) {
-        findRequest(analysisId).complete(totalFindings);
+    public void complete(Long analysisId, int totalFindings, Severity overallSeverity) {
+        findRequest(analysisId).complete(totalFindings, overallSeverity);
     }
 
     @Transactional

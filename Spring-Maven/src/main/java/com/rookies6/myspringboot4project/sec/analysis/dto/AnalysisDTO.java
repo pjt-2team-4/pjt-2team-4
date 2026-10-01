@@ -9,7 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,17 +23,18 @@ public class AnalysisDTO {
         @NotBlank(message = "분석 제목(Title)은 필수입니다.")
         private String title;
 
-        @NotBlank(message = "언어 설정은 필수입니다.")
         private String language;
 
         @NotNull(message = "분석할 파일 목록은 필수입니다.")
-        private List<FileRequest> files;
+        @Size(min = 1, max = 20)
+        private List<@Valid FileRequest> files;
 
         @Getter
         @NoArgsConstructor
         public static class FileRequest {
-            @NotBlank(message = "파일 경로는 필수입니다.")
-            private String filePath;
+            @NotBlank
+            @Size(max = 500)
+            private String relativePath;
 
             @NotBlank(message = "파일 내용은 필수입니다.")
             private String content;

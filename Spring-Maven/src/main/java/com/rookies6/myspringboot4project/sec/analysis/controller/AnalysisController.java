@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import com.rookies6.myspringboot4project.common.dto.ApiResponse;
+import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisResultDTO;
+
 import java.util.List;
 
 @RestController
@@ -63,13 +66,10 @@ public class AnalysisController {
      * GET /api/v1/analyses/{id}/status
      */
     @GetMapping("/{id}/status")
-    public ResponseEntity<AnalysisDTO.StatusResponse> getAnalysisStatus(
-            @PathVariable Long id) {
-
-        AnalysisDTO.StatusResponse response =
-                analysisService.getAnalysisStatus(id);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<AnalysisResultDTO.StatusResponse>>
+    getAnalysisStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.success(analysisService.getAnalysisStatus(id)));
     }
 
     /**

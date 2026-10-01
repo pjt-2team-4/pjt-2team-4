@@ -16,7 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisResultDTO;
+import com.rookies6.myspringboot4project.sec.common.enums.Language;
+import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import java.time.temporal.ChronoUnit;
+
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -40,15 +47,7 @@ public class AnalysisService {
                         ErrorCode.RESOURCE_NOT_FOUND, "User", "id", 1L
                 ));
 
-        // 2. 분석 요청(엔티티) 생성
-        AnalysisRequest analysisRequest = AnalysisRequest.create(
-                user,
-                request.getTitle(),
-                request.getLanguage(),
-                30 // estimatedDurationSeconds
-        );
-
-        // 3. 클라이언트가 보낸 파일 데이터를 AnalysisFile로 변환하여 추가
+        // 2. 파일별 언어 중 가장 많은 언어를 대표 언어로 사용
         List<AnalysisDTO.Request.FileRequest> targetFiles = request.getFiles();
 
         if (targetFiles == null || targetFiles.isEmpty()) {
@@ -57,15 +56,48 @@ public class AnalysisService {
             );
         }
 
+        Map<Language, Integer> languageCounts = new LinkedHashMap<>();
+        for (AnalysisDTO.Request.FileRequest fileReq : targetFiles) {
+            Language language = Language.fromFileName(fileReq.getRelativePath());
+            if (!language.isSupported()) {
+                throw new BusinessException(
+                        ErrorCode.INVALID_INPUT,
+                        "지원하지 않는 파일 형식입니다: " + fileReq.getRelativePath()
+                );
+            }
+            languageCounts.merge(language, 1, Integer::sum);
+        }
+
+        Language primaryLanguage = null;
+        int maxCount = 0;
+        for (var entry : languageCounts.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                primaryLanguage = entry.getKey();
+                maxCount = entry.getValue();
+            }
+        }
+
+        AnalysisRequest analysisRequest = AnalysisRequest.create(
+                user,
+                request.getTitle(),
+                primaryLanguage.name(),
+                30 // estimatedDurationSeconds
+        );
+
+        // 3. 클라이언트가 보낸 파일 데이터를 AnalysisFile로 변환하여 추가
+
         for (AnalysisDTO.Request.FileRequest fileReq : targetFiles) {
             int lineCount = fileReq.getContent() != null
                     ? fileReq.getContent().split("\n", -1).length
                     : 0;
 
+            String relativePath = fileReq.getRelativePath();
+            Language fileLanguage = Language.fromFileName(relativePath);
+
             AnalysisFile analysisFile = AnalysisFile.builder()
-                    .relativePath(fileReq.getFilePath())
-                    .fileName(extractFileName(fileReq.getFilePath()))
-                    .language(request.getLanguage())
+                    .relativePath(relativePath)
+                    .fileName(extractFileName(relativePath))
+                    .language(fileLanguage.name())
                     .content(fileReq.getContent())
                     .lineCount(lineCount)
                     .build();
@@ -115,16 +147,88 @@ public class AnalysisService {
         return AnalysisDTO.Response.fromEntity(analysisRequest);
     }
 
+    private final AnalysisProgressStore progressStore;
+
     /**
      * 분석 상태
      */
-    public AnalysisDTO.StatusResponse getAnalysisStatus(Long id) {
-        AnalysisRequest analysisRequest = analysisRequestRepository.findById(id)
+    public AnalysisResultDTO.StatusResponse getAnalysisStatus(Long id) {
+        AnalysisRequest request = analysisRequestRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id
-                ));
+                        ErrorCode.RESOURCE_NOT_FOUND, "AnalysisRequest", "id", id));
 
-        return AnalysisDTO.StatusResponse.fromEntity(analysisRequest);
+        var snapshot = progressStore.get(id).orElse(null);
+        int totalFiles = snapshot != null
+                ? snapshot.totalFiles()
+                : request.getAnalysisFiles().size();
+
+        List<AnalysisProgressStore.LogLine> logs = snapshot == null
+                ? List.of()
+                : snapshot.recentLogs();
+
+        var response = AnalysisResultDTO.StatusResponse.builder()
+                .analysisId(request.getId())
+                .status(request.getStatus().name());
+
+        switch (request.getStatus()) {
+            case PENDING -> response
+                    .progress(0)
+                    .totalFiles(totalFiles);
+
+            case SCANNING -> {
+                int processed = snapshot == null ? 0 : snapshot.processedFiles();
+                int progress = totalFiles == 0
+                        ? 0
+                        : Math.min(40, processed * 40 / totalFiles);
+
+                response.stage("SCAN")
+                        .stageLabel("규칙 기반 탐지 중")
+                        .progress(progress)
+                        .currentFile(snapshot == null ? null : snapshot.currentFile())
+                        .processedFiles(processed)
+                        .totalFiles(totalFiles)
+                        .findingsSoFar(snapshot == null ? 0 : snapshot.findingsSoFar())
+                        .recentLogs(logs)
+                        .startedAt(request.getStartedAt());
+            }
+
+            case EXPLAINING -> response
+                    .stage("EXPLAIN")
+                    .stageLabel("AI 설명 생성 중")
+                    .progress(40)
+                    .totalFindings(request.getTotalFindings())
+                    .recentLogs(logs);
+
+            case COMPLETED -> {
+//                var highest = Severity.highest(
+//                        request.getAnalysisFiles().stream()
+//                                .flatMap(file -> file.getFindings().stream())
+//                                .map(finding -> finding.getSeverity())
+//                                .toList());
+
+                Long duration = request.getStartedAt() != null
+                        && request.getCompletedAt() != null
+                        ? ChronoUnit.SECONDS.between(
+                        request.getStartedAt(), request.getCompletedAt())
+                        : null;
+
+                response.stage("DONE")
+                        .progress(100)
+                        .totalFiles(totalFiles)
+                        .totalFindings(request.getTotalFindings())
+                        .overallSeverity(request.getOverallSeverity() == null
+                                ? null
+                                : request.getOverallSeverity().name())
+                        .durationSeconds(duration)
+                        .completedAt(request.getCompletedAt());
+            }
+
+            case FAILED -> response
+                    .stage("SCAN")
+                    .errorMessage(request.getErrorMessage());
+        }
+
+        return response.build();
     }
 
 /**
