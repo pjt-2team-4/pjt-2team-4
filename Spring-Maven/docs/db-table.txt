@@ -1,14 +1,15 @@
 
 
-desc analysis_files;
-desc analysis_requests;
-desc users;
-desc vulnerability_finding;
+DESC analysis_requests;
+DESC analysis_files;
+DESC finding_vulnerability;
+DESC users;
 
 
-select * from analysis_files;
+
 select * from analysis_requests;
+select * from analysis_files;
+select * from finding_vulnerability;
 select * from users;
-select * from vulnerability_finding;
 
 
