@@ -3,14 +3,11 @@ package com.rookies6.myspringboot4project.sec.analysis.dto;
 import com.rookies6.myspringboot4project.sec.analysis.entity.FindingVulnerability;
 import com.rookies6.myspringboot4project.sec.analysis.entity.LlmAnalysis;
 import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
-import com.rookies6.myspringboot4project.sec.common.enums.FindingStatus;
 import com.rookies6.myspringboot4project.sec.scanner.rule.RuleCatalog;
 import com.rookies6.myspringboot4project.sec.scanner.rule.SecurityRule;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
