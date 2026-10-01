@@ -43,18 +43,4 @@ public class FindingService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "취약점을 찾을 수 없습니다: " + findingId));
         return FindingDTO.Detail.from(finding);
     }
-
-    /** 14번 */
-    @Transactional
-    public FindingDTO.StatusUpdateResponse updateStatus(Long findingId, FindingStatus status) {
-        FindingVulnerability finding = findingRepository.findById(findingId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "취약점을 찾을 수 없습니다: " + findingId));
-
-        switch (status) {
-            case RESOLVED -> finding.resolve();
-            case IGNORED -> finding.ignore();
-            case OPEN -> finding.reopen();
-        }
-        return FindingDTO.StatusUpdateResponse.from(finding);
-    }
 }
