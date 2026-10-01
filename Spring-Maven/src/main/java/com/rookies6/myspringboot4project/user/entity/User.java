@@ -30,14 +30,4 @@ public class User extends BaseEntity {
         this.email = email;
         this.password = password;
     }
-
-    // Setter 대신 의미 있는 비즈니스 메서드 사용 권장
-    public void changePassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    // 이 메서드를 추가해 주세요!
-    public void changeEmail(String newEmail) {
-        this.email = newEmail;
-    }
 }
