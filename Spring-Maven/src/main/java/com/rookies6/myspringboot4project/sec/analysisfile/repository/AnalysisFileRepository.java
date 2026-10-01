@@ -14,4 +14,5 @@ public interface AnalysisFileRepository extends JpaRepository<AnalysisFile, Long
 
     @Query("SELECT COUNT(f) FROM AnalysisFile f WHERE f.analysisRequest.id = :analysisId")
     long countByAnalysisRequestId(@Param("analysisId") Long analysisId);
+
 }

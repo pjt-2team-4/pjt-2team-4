@@ -4,6 +4,7 @@ import com.rookies6.myspringboot4project.sec.common.enums.Language;
 import com.rookies6.myspringboot4project.sec.scanner.SecurityScanner;
 import com.rookies6.myspringboot4project.sec.scanner.dto.RawFinding;
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 
 import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -23,7 +25,7 @@ public class AnalysisWorker {
     private final SecurityScanner scanner;
 
     @Async("analysisTaskExecutor")
-    public void runAnalysisPipeline(Long analysisId) {
+    public void runAnalysisPipeline(Long analysisId, Set<VulnerabilityType> enabledTypes) {
         try {
             stateService.markScanning(analysisId);
 
@@ -40,7 +42,7 @@ public class AnalysisWorker {
 
                 Language language = Language.fromFileName(target.fileName());
                 List<RawFinding> findings = scanner.scan(
-                        target.relativePath(), language, target.content());
+                        target.relativePath(), language, target.content(), enabledTypes);
 
                 stateService.saveFindings(target.fileId(), findings);
                 totalFindings += findings.size();

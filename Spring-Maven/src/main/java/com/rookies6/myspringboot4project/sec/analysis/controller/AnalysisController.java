@@ -2,6 +2,7 @@ package com.rookies6.myspringboot4project.sec.analysis.controller;
 
 import com.rookies6.myspringboot4project.sec.analysis.dto.AnalysisDTO;
 import com.rookies6.myspringboot4project.sec.analysis.service.AnalysisService;
+import com.rookies6.myspringboot4project.sec.analysis.service.AnalysisResultService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +20,21 @@ import java.util.List;
 public class AnalysisController {
 
     private final AnalysisService analysisService;
+    private final AnalysisResultService analysisResultService;
 
     /**
      * 분석 요청 생성
      * POST /api/v1/analyses
      */
     @PostMapping
-    public ResponseEntity<AnalysisDTO.Response> createAnalysis(
+    public ResponseEntity<ApiResponse<AnalysisResultDTO.AcceptedResponse>> createAnalysis(
             @Valid @RequestBody AnalysisDTO.Request request) {
 
-        AnalysisDTO.Response response =
+        AnalysisResultDTO.AcceptedResponse response =
                 analysisService.analyzeCode(request);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(ApiResponse.success(response, "분석 요청이 접수되었습니다"));
     }
 
     /**
@@ -52,13 +55,10 @@ public class AnalysisController {
      * GET /api/v1/analyses/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AnalysisDTO.Response> getAnalysisById(
-            @PathVariable Long id) {
-
-        AnalysisDTO.Response response =
-                analysisService.getAnalysisById(id);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<AnalysisResultDTO.SummaryResponse>> getAnalysisById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(
+                analysisResultService.getSummary(id),
+                "분석 결과 요약 조회가 완료되었습니다"));
     }
 
     /**

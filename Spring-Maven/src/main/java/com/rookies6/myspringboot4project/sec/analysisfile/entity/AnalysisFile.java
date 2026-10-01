@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -66,5 +67,15 @@ public class AnalysisFile extends BaseEntity {
     public void addFinding(FindingVulnerability finding) {
         this.findings.add(finding);
         finding.assignTo(this);
+    }
+
+    public String extractSnippet(int startLine, int endLine) {
+        if (content == null) {
+            return "";
+        }
+        String[] lines = content.split("\n", -1);
+        int from = Math.max(1, startLine);
+        int to = Math.min(lines.length, endLine);
+        return from > to ? "" : String.join("\n", Arrays.copyOfRange(lines, from - 1, to));
     }
 }

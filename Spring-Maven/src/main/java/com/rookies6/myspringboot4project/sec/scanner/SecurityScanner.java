@@ -2,6 +2,7 @@ package com.rookies6.myspringboot4project.sec.scanner;
 
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 
 import com.rookies6.myspringboot4project.sec.scanner.dto.RawFinding;
 import com.rookies6.myspringboot4project.sec.scanner.rule.RuleCatalog;
@@ -40,13 +41,20 @@ public class SecurityScanner {
      * @return 탐지된 취약점 목록 (없으면 빈 리스트)
      */
     public List<RawFinding> scan(String relativePath, Language language, String content) {
+        return scan(relativePath, language, content, Set.of(VulnerabilityType.values()));
+    }
+
+    public List<RawFinding> scan(String relativePath, Language language, String content,
+                                 Set<VulnerabilityType> enabledTypes) {
         if (language == null || !language.isSupported() || content == null || content.isBlank()) {
             return List.of();
         }
 
         String[] originalLines = content.split("\n", -1);
         String[] scanLines = stripComments(originalLines, language);
-        List<SecurityRule> rules = RuleCatalog.forLanguage(language);
+        List<SecurityRule> rules = RuleCatalog.forLanguage(language).stream()
+                .filter(rule -> enabledTypes.contains(rule.getVulnerabilityType()))
+                .toList();
         if (rules.isEmpty()) {
             return List.of();
         }
