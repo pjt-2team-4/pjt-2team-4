@@ -1,10 +1,10 @@
-package com.rookies6.myspringboot4project.sec.auth.service;
+package com.rookies6.myspringboot4project.user.service;
 
-import com.rookies6.myspringboot4project.sec.auth.dto.SignupDTO;
+import com.rookies6.myspringboot4project.user.dto.SignupDTO;
 import com.rookies6.myspringboot4project.exception.BusinessException;
 import com.rookies6.myspringboot4project.exception.ErrorCode;
-import com.rookies6.myspringboot4project.sec.auth.entity.User;
-import com.rookies6.myspringboot4project.sec.auth.repository.UserRepository;
+import com.rookies6.myspringboot4project.user.entity.User;
+import com.rookies6.myspringboot4project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;

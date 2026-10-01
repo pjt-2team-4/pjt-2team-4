@@ -1,4 +1,4 @@
-package com.rookies6.myspringboot4project.sec.auth.exception;
+package com.rookies6.myspringboot4project.user.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

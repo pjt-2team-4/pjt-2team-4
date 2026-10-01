@@ -1,6 +1,6 @@
-package com.rookies6.myspringboot4project.sec.auth.dto;
+package com.rookies6.myspringboot4project.user.dto;
 
-import com.rookies6.myspringboot4project.sec.auth.entity.User;
+import com.rookies6.myspringboot4project.user.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
