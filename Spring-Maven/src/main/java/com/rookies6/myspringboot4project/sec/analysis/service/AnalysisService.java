@@ -9,6 +9,8 @@ import com.rookies6.myspringboot4project.sec.analysisfile.entity.AnalysisFile;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisRequest;
 import com.rookies6.myspringboot4project.sec.analysis.entity.AnalysisStatus;
 import com.rookies6.myspringboot4project.sec.analysis.repository.AnalysisRequestRepository;
+import com.rookies6.myspringboot4project.user.entity.User;
+import com.rookies6.myspringboot4project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,8 @@ import java.util.List;
 public class AnalysisService {
 
     private final AnalysisRequestRepository analysisRequestRepository;
+    private final UserRepository userRepository; 
+    private final AnalysisWorker analysisWorker;
 
     /**
      * 1. 전체 분석 히스토리 목록 조회
@@ -59,8 +63,16 @@ public class AnalysisService {
      */
     @Transactional
     public AnalysisResponseDto createAnalysis(AnalysisRequestDto requestDto) {
+
+        // 📌 1. DB에서 사용자 조회 (user_id 맵핑용)
+        User user = userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "User", "id", requestDto.getUserId()
+                ));
+
         // AnalysisRequest 엔티티 생성 (초기 상태: PENDING)
         AnalysisRequest request = AnalysisRequest.builder()
+                .user(user)
                 .title(requestDto.getTitle())
                 .language(requestDto.getLanguage())
                 .status(AnalysisStatus.PENDING)
@@ -93,6 +105,8 @@ public class AnalysisService {
         }
 
         AnalysisRequest savedRequest = analysisRequestRepository.save(request);
+
+	analysisWorker.runScannerAndLlmProcess(savedRequest.getId());
 
         return AnalysisResponseDto.fromEntity(savedRequest);
     }

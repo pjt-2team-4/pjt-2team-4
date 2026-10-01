@@ -45,7 +45,8 @@ public class AnalysisRequest extends BaseEntity {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
-    // AnalysisFile과의 연관관계 (CascadeType.ALL로 파일도 함께 관리)
+    // 📌 1. @Builder.Default 추가: Builder를 통해 객체 생성 시 new ArrayList<>() 기본값을 유지하게 함
+    @Builder.Default
     @OneToMany(
             mappedBy = "analysisRequest",
             cascade = CascadeType.ALL,
@@ -54,14 +55,8 @@ public class AnalysisRequest extends BaseEntity {
     )
     private List<AnalysisFile> analysisFiles = new ArrayList<>();
 
-    @Builder
-    public AnalysisRequest(User user, String title, String language, AnalysisStatus status, Integer estimatedDurationSeconds) {
-        this.user = user;
-        this.title = title;
-        this.language = language;
-        this.status = status;
-        this.estimatedDurationSeconds = estimatedDurationSeconds;
-    }
+    // 📌 2. 기존에 있던 @Builder가 붙은 생성자(public AnalysisRequest(...))는 삭제했습니다.
+    // 클래스 상단의 @Builder와 충돌하여 analysisFiles를 null로 만듭니다.
 
     /**
      * 분석 요청 생성 팩토리 메서드

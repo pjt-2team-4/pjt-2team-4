@@ -15,6 +15,9 @@ import java.util.List;
 @Builder
 public class AnalysisRequestDto {
 
+    @NotNull(message = "사용자 ID는 필수입니다.") // 📌 유저 ID 추가
+    private Long userId;
+
     @NotBlank(message = "분석 제목(Title)은 필수입니다.")
     private String title;
 
