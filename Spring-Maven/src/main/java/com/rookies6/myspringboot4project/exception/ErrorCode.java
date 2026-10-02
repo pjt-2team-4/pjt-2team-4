@@ -21,6 +21,16 @@ public enum ErrorCode {
             HttpStatus.NOT_FOUND
     ),
 
+    FINDING_ALREADY_RESOLVED(
+            "이미 해결 처리된 취약점입니다: %s",
+            HttpStatus.CONFLICT
+    ),
+
+    INVALID_FINDING_STATUS(
+            "유효하지 않은 취약점 상태값입니다: %s",
+            HttpStatus.BAD_REQUEST
+    ),
+
     STUDENT_NUMBER_DUPLICATE(
             "이미 존재하는 학번입니다: %s",
             HttpStatus.CONFLICT

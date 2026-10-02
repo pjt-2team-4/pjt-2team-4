@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login").permitAll()
+                    auth.requestMatchers("/api/v1/auth/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 // 시큐리티가 토큰을 검증하기 전 요청에서 토큰의 유무를 검사하기 위해 jwtAuthenticationFilter을 먼저 실행
