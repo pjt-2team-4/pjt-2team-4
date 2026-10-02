@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService{
         User user = ((UserInfoUserDetails) Objects.requireNonNull(authentication.getPrincipal())).getUser(); // getUser() 메서드 필요
         String accessToken = jwtTokenProvider.generateAccessToken(user);
 
-        return LoginDTO.Response.of(accessToken, jwtTokenProvider.getAccessExpirationSeconds());
+        return LoginDTO.Response.of(user, accessToken, jwtTokenProvider.getAccessExpirationSeconds());
     }
 
 }

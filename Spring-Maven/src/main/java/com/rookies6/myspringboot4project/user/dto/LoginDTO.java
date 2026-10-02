@@ -26,12 +26,16 @@ public class LoginDTO {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Builder
     public static class Response {
+        private final Long id;
+        private final String email;
         private final String accessToken;
         private final String tokenType;
         private final long expiresIn;
 
-        public static LoginDTO.Response of(String accessToken, long expiresInSeconds) {
+        public static LoginDTO.Response of(User user,String accessToken, long expiresInSeconds) {
             return Response.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
                     .accessToken(accessToken)
                     .tokenType("Bearer")
                     .expiresIn(expiresInSeconds)
