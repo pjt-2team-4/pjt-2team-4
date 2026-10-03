@@ -30,7 +30,7 @@ class LlmLiveIntegrationTest {
     @Autowired private UserRepository users;
 
     @Test
-    void scannerFindingIsExplainedByRunningFastApiMock() throws InterruptedException {
+    void scannerFindingIsExplainedByRunningFastApi() throws InterruptedException {
         User user = users.save(User.builder()
                 .email(UUID.randomUUID() + "@example.com").password("hash").build());
         AnalysisRequest request = AnalysisRequest.create(user, "Live LLM test", "JAVA", 30);
@@ -41,7 +41,7 @@ class LlmLiveIntegrationTest {
 
         worker.runAnalysisPipeline(id, Set.of(VulnerabilityType.values()));
 
-        Instant deadline = Instant.now().plus(Duration.ofSeconds(10));
+        Instant deadline = Instant.now().plus(Duration.ofSeconds(180));
         while (Instant.now().isBefore(deadline)) {
             AnalysisRequest current = requests.findById(id).orElseThrow();
             if (current.getStatus() == AnalysisStatus.COMPLETED) {
@@ -55,8 +55,14 @@ class LlmLiveIntegrationTest {
         assertThat(requests.findById(id).orElseThrow().getStatus()).isEqualTo(AnalysisStatus.COMPLETED);
         var saved = findings.findForExplanation(id);
         assertThat(saved).hasSize(1);
-        assertThat(saved.get(0).getLlmAnalysis().getStatus()).isEqualTo(LlmAnalysisStatus.SUCCESS);
-        assertThat(saved.get(0).getLlmAnalysis().getModelName()).isEqualTo("mock");
-        assertThat(saved.get(0).getLlmAnalysis().getExplanation()).isNotBlank();
+        var llmAnalysis = saved.get(0).getLlmAnalysis();
+        assertThat(llmAnalysis.getStatus()).isEqualTo(LlmAnalysisStatus.SUCCESS);
+        String expectedModel = System.getProperty("codeguard.llm.expected-model", "mock");
+        assertThat(llmAnalysis.getModelName()).startsWith(expectedModel);
+        assertThat(llmAnalysis.getExplanation()).isNotBlank();
+        if (!"mock".equals(expectedModel)) {
+            assertThat(llmAnalysis.getPromptTokens()).isPositive();
+            assertThat(llmAnalysis.getCompletionTokens()).isPositive();
+        }
     }
 }
