@@ -23,9 +23,11 @@ public class AnalysisWorker {
     private final AnalysisStateService stateService;
     private final AnalysisProgressStore progressStore;
     private final SecurityScanner scanner;
+    private final LlmAnalysisService llmAnalysisService;
 
     @Async("analysisTaskExecutor")
     public void runAnalysisPipeline(Long analysisId, Set<VulnerabilityType> enabledTypes) {
+        boolean explaining = false;
         try {
             stateService.markScanning(analysisId);
 
@@ -61,13 +63,23 @@ public class AnalysisWorker {
                 progressStore.updateFile(analysisId, target.relativePath(), i + 1);
             }
 
-            // #8에서 탐지 건수가 있으면 EXPLAINING 및 LLM 설명 단계로 연결한다.
+            if (totalFindings > 0) {
+                stateService.startExplaining(analysisId, totalFindings);
+                explaining = true;
+                progressStore.log(analysisId, "AI 설명 생성 시작 (%d건)".formatted(totalFindings));
+                if (!llmAnalysisService.explainAll(analysisId)) {
+                    log.warn("LLM 설명 단계 타임아웃: analysisId={}", analysisId);
+                    return;
+                }
+            }
             stateService.complete(analysisId, totalFindings, Severity.highest(severities));
             log.info("분석 완료: analysisId={}, findings={}", analysisId, totalFindings);
 
         } catch (Exception e) {
             log.error("분석 실패: analysisId={}", analysisId, e);
-            stateService.fail(analysisId, "코드 분석 중 오류가 발생했습니다.");
+            stateService.fail(analysisId, explaining
+                    ? "AI 설명 처리 중 오류가 발생했습니다."
+                    : "코드 분석 중 오류가 발생했습니다.");
         } finally {
             progressStore.clear(analysisId);
         }

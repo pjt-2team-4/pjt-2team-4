@@ -28,6 +28,7 @@ public class AnalysisProgressStore {
             int processedFiles,
             int totalFiles,
             int findingsSoFar,
+            int explainedFindings,
             List<LogLine> recentLogs
     ) {
     }
@@ -38,6 +39,7 @@ public class AnalysisProgressStore {
         private String currentFile;
         private int processedFiles;
         private int findingsSoFar;
+        private int explainedFindings;
 
         private Progress(int totalFiles) {
             this.totalFiles = totalFiles;
@@ -52,6 +54,10 @@ public class AnalysisProgressStore {
             findingsSoFar += count;
         }
 
+        private synchronized void addExplained() {
+            explainedFindings++;
+        }
+
         private synchronized void log(String message) {
             if (logs.size() == MAX_LOGS) {
                 logs.removeFirst();
@@ -62,7 +68,7 @@ public class AnalysisProgressStore {
         private synchronized Snapshot snapshot() {
             return new Snapshot(
                     currentFile, processedFiles, totalFiles,
-                    findingsSoFar, List.copyOf(logs));
+                    findingsSoFar, explainedFindings, List.copyOf(logs));
         }
     }
 
@@ -81,6 +87,13 @@ public class AnalysisProgressStore {
         Progress progress = store.get(analysisId);
         if (progress != null) {
             progress.addFindings(count);
+        }
+    }
+
+    public void addExplained(Long analysisId) {
+        Progress progress = store.get(analysisId);
+        if (progress != null) {
+            progress.addExplained();
         }
     }
 

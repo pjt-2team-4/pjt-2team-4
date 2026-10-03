@@ -41,6 +41,7 @@ public class AnalysisResultDTO {
         private final int totalFiles;
         private final int findingsSoFar;
         private final Integer totalFindings;
+        private final Integer explainedFindings;
         private final String errorMessage;
         private final LocalDateTime startedAt;
         private final LocalDateTime completedAt;

@@ -228,12 +228,18 @@ public class AnalysisService {
                         .startedAt(request.getStartedAt());
             }
 
-            case EXPLAINING -> response
-                    .stage("EXPLAIN")
-                    .stageLabel("AI 설명 생성 중")
-                    .progress(40)
-                    .totalFindings(request.getTotalFindings())
-                    .recentLogs(logs);
+            case EXPLAINING -> {
+                int total = request.getTotalFindings();
+                int explained = snapshot == null ? 0 : snapshot.explainedFindings();
+                response.stage("EXPLAIN")
+                        .stageLabel("AI 설명 생성 중")
+                        .progress(total == 0 ? 40
+                                : Math.min(100, 40 + explained * 60 / total))
+                        .totalFindings(total)
+                        .explainedFindings(explained)
+                        .recentLogs(logs)
+                        .startedAt(request.getStartedAt());
+            }
 
             case COMPLETED -> {
 //                var highest = Severity.highest(
@@ -260,7 +266,8 @@ public class AnalysisService {
             }
 
             case FAILED -> response
-                    .stage("SCAN")
+                    .stage(request.getTotalFindings() != null && request.getTotalFindings() > 0
+                            ? "EXPLAIN" : "SCAN")
                     .errorMessage(request.getErrorMessage());
         }
 

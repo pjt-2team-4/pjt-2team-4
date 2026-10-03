@@ -141,6 +141,14 @@ public class AnalysisRequest extends BaseEntity {
         this.startedAt = LocalDateTime.now();
     }
 
+    public void startExplaining(int totalFindings) {
+        if (this.status != AnalysisStatus.SCANNING || totalFindings <= 0) {
+            throw new IllegalStateException("탐지된 취약점이 있는 SCANNING 상태에서만 설명을 시작할 수 있습니다.");
+        }
+        this.totalFindings = totalFindings;
+        this.status = AnalysisStatus.EXPLAINING;
+    }
+
     public void complete(int totalFindings, Severity overallSeverity) {
         if (this.status != AnalysisStatus.SCANNING
                 && this.status != AnalysisStatus.EXPLAINING) {

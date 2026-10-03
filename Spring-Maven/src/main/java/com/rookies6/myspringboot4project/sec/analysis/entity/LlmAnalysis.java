@@ -78,6 +78,45 @@ public class LlmAnalysis extends BaseEntity {
         return analysis;
     }
 
+    public void succeed(String explanation, String riskDescription, String attackScenario,
+                        String remediation, String fixedCode, LlmVerdict verdict,
+                        Integer confidence, String modelName, String promptVersion,
+                        String rawResponse, Integer promptTokens, Integer completionTokens) {
+        requirePending();
+        if (explanation == null || explanation.isBlank()
+                || remediation == null || remediation.isBlank()) {
+            throw new IllegalArgumentException("LLM 설명과 개선 방안은 필수입니다.");
+        }
+        this.explanation = explanation;
+        this.riskDescription = riskDescription;
+        this.attackScenario = attackScenario;
+        this.remediation = remediation;
+        this.fixedCode = fixedCode;
+        this.verdict = verdict == null ? LlmVerdict.UNCERTAIN : verdict;
+        this.confidence = confidence;
+        this.modelName = modelName;
+        this.promptVersion = promptVersion;
+        this.rawResponse = rawResponse;
+        this.promptTokens = promptTokens;
+        this.completionTokens = completionTokens;
+        this.status = LlmAnalysisStatus.SUCCESS;
+    }
+
+    public void fail(String errorMessage, String rawResponse, String promptVersion) {
+        requirePending();
+        this.errorMessage = errorMessage == null ? null
+                : errorMessage.substring(0, Math.min(errorMessage.length(), 500));
+        this.rawResponse = rawResponse;
+        this.promptVersion = promptVersion;
+        this.status = LlmAnalysisStatus.FAILED;
+    }
+
+    private void requirePending() {
+        if (status != LlmAnalysisStatus.PENDING) {
+            throw new IllegalStateException("대기 중인 LLM 분석만 갱신할 수 있습니다.");
+        }
+    }
+
     void assignTo(FindingVulnerability finding) {
         this.finding = finding;
     }

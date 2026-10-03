@@ -76,6 +76,21 @@ class AnalysisStatusResponseTest {
     }
 
     @Test
+    void explainingProgressIncludesSuccessfulAndFailedFindings() {
+        AnalysisRequest request = request(AnalysisStatus.EXPLAINING);
+        when(request.getTotalFindings()).thenReturn(4);
+        store.start(10L, 1);
+        store.addExplained(10L);
+        store.addExplained(10L);
+
+        var result = service.getAnalysisStatus(10L);
+
+        assertThat(result.getStage()).isEqualTo("EXPLAIN");
+        assertThat(result.getExplainedFindings()).isEqualTo(2);
+        assertThat(result.getProgress()).isEqualTo(70);
+    }
+
+    @Test
     void failedReturnsReason() {
         AnalysisRequest request = request(AnalysisStatus.FAILED);
         when(request.getErrorMessage()).thenReturn("분석 실패");

@@ -6,6 +6,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.context.annotation.Bean;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @EnableAsync // 비동기 처리 활성화
 @Configuration
@@ -20,5 +22,10 @@ public class AsyncConfig {
         executor.setThreadNamePrefix("AnalysisWorker-");
         executor.initialize();
         return executor;
+    }
+
+    @Bean(name = "llmTaskExecutor", destroyMethod = "shutdown")
+    public ExecutorService llmTaskExecutor() {
+        return Executors.newFixedThreadPool(4);
     }
 }
