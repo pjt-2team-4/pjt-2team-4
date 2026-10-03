@@ -1,0 +1,159 @@
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 20px 14px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+}
+
+
+.brand {
+    padding: 10px 12px 22px;
+
+    color: #0f172a;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+.menuList {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.menuItem {
+    margin-bottom: 4px;
+}
+
+
+.menuItem a {
+    display: flex;
+    align-items: center;
+
+    min-height: 42px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    border-radius: 8px;
+
+    color: #475569;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.menuItem a:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+
+.menuItem a.active {
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 700;
+}
+
+
+.sectionTitle {
+    padding: 14px 13px 7px;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.04em;
+}
+
+
+.divider {
+    height: 1px;
+
+    margin: 14px 4px;
+
+    background: #e2e8f0;
+}
+
+
+.userInfo {
+    padding: 10px 14px;
+
+    margin-bottom: 6px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+}
+
+
+.userInfoLabel {
+    margin-bottom: 3px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+.userEmail {
+    color: #1e293b;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1.5;
+
+    word-break: break-all;
+}
+
+
+.logoutBtn {
+    width: 100%;
+
+    min-height: 42px;
+
+    padding: 0 13px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #475569;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+
+.logoutBtn:hover {
+    background: #fef2f2;
+
+    color: #dc2626;
+}

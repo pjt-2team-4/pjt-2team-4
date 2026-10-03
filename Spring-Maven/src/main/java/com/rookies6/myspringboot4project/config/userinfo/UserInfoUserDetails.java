@@ -1,59 +1,85 @@
 package com.rookies6.myspringboot4project.config.userinfo;
 
 import com.rookies6.myspringboot4project.user.entity.User;
+
 import lombok.Getter;
-import org.jspecify.annotations.Nullable;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
-public class UserInfoUserDetails implements UserDetails {
 
-    private String email;
-    private String password;
+public class UserInfoUserDetails
+        implements UserDetails {
+
+
+    private final String email;
+
+    private final String password;
+
+
     @Getter
-    private User user;
+    private final User user;
+
 
     public UserInfoUserDetails(User user) {
+
         this.user = user;
+
         this.email = user.getEmail();
+
         this.password = user.getPassword();
     }
 
+
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority>
+    getAuthorities() {
+
         return List.of();
     }
 
+
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
+
         return password;
     }
 
+
     @Override
     public String getUsername() {
-        return this.email;
+
+        return email;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+
+        return true;
     }
+
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+
+        return true;
     }
+
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+
+        return true;
     }
+
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+
+        return true;
     }
 }

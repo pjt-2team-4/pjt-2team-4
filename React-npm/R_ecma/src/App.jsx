@@ -1,89 +1,203 @@
-/* ---------------------------------------------------------
-   App.jsx — 주소에 따라 어느 페이지를 보여 줄지 정하는 곳
-   5부에서는 App 이 상태를 모두 갖고 화면도 직접 그렸습니다.
-   6부에서는 그 일이 페이지 컴포넌트로 내려가고, App 은
-   "주소 → 페이지" 를 이어 주는 일만 합니다.
+import React from 'react';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route
+} from 'react-router-dom';
 
-     주소            보여 줄 페이지
-     ------------    ----------------------------
-     /               학생 목록
-     /new            학생 등록 폼
-     /edit/3         3번 학생 수정 폼
-     그 밖의 주소     없는 주소 안내
+import Sidebar from './components/Sidebar';
+import AnalysisLayout from './components/AnalysisLayout';
 
-   5부의 editingId state 가 사라진 것에 주목하세요.
-   "지금 몇 번 학생을 수정 중인가" 를 주소가 알고 있기 때문입니다.
-   --------------------------------------------------------- */
+// Home
+import Home from './pages/Home';
 
-import { Link, NavLink, Route, Routes } from "react-router-dom";
+// Dashboard
+import Dashboard from './pages/dashboard/Dashboard';
 
-import StudentListPage from "./pages/StudentListPage.jsx";
-import StudentFormPage from "./pages/StudentFormPage.jsx";
-import NotFoundPage from "./pages/NotFoundPage.jsx";
+// API Test
+import ApiTest from './pages/ApiTest';
 
-import AppMessage from "./components/AppMessage.jsx";
+// User
+import SignUp from './pages/user/SignUp';
+import Login from './pages/user/Login';
 
-// 지금 어느 모드로 도는지 (TEST / PROD)
-import { APP_MODE } from "./config.js";
+// Analysis
+import AnalysisCreate from './pages/analysis/AnalysisCreate';
+import AnalysisDetail from './pages/analysis/AnalysisDetail';
+import AnalysisList from './pages/analysis/AnalysisList';
+import AnalysisLoading from './pages/analysis/AnalysisLoading';
+import AnalysisFileList from './pages/analysis/AnalysisFileList';
+import AnalysisFileDetail from './pages/analysis/AnalysisFileDetail';
 
-import "./style.css";
+// Findings
+import FindingList from './pages/finding/FindingList';
+import FindingDetail from './pages/finding/FindingDetail';
+
 
 function App() {
-
-    // 제목 옆에 붙일 배지의 class. 운영이면 빨강, 아니면 회색.
-    let modeClass = "app-mode test";
-    if (APP_MODE === "PROD") {
-        modeClass = "app-mode prod";
-    }
-
     return (
-        <>
-            {/* 어느 페이지에서나 보이는 머리말. Routes 바깥에 있어서 바뀌지 않는다. */}
-            <header className="app-header">
-                {/* Link 는 <a> 처럼 보이지만 페이지를 새로 내려받지 않는다.
-                    주소만 바꾸고 React 가 화면을 갈아 끼운다. */}
-                <div className="app-brand">
-                    <Link to="/" className="app-title">학생 관리 시스템</Link>
-                    <span className={modeClass}>{APP_MODE}</span>
-                </div>
+        <Router>
 
-                <nav className="app-nav">
-                    {/* NavLink 는 Link 와 같지만, 지금 보고 있는 주소와 맞으면
-                        className 에 isActive 가 true 로 들어온다.
-                        그래서 "지금 여기 있다" 를 표시할 수 있다. */}
-                    <NavLink
-                        to="/"
-                        end
-                        className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
-                    >
-                        학생 목록
-                    </NavLink>
+            <div style={styles.app}>
 
-                    <NavLink
-                        to="/new"
-                        className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
-                    >
-                        학생 등록
-                    </NavLink>
-                </nav>
-            </header>
+                <Sidebar />
 
-            {/* store 의 메시지를 그리는 자리. 어느 페이지에서든 여기 뜬다. */}            
-            <AppMessage />
+                <main style={styles.main}>
 
-            {/* Routes 안에서 주소와 맞는 Route 하나만 그려진다. */}
-            <Routes>
-                <Route path="/" element={<StudentListPage />} />
-                <Route path="/new" element={<StudentFormPage />} />
+                    <Routes>
 
-                {/* :id 는 자리를 비워 둔다는 뜻이다. /edit/3 이면 id 가 "3" 이 된다. */}
-                <Route path="/edit/:id" element={<StudentFormPage />} />
+                        {/* ================================
+                            Home
+                        ================================= */}
+                        <Route
+                            path="/"
+                            element={<Home />}
+                        />
 
-                {/* * 는 위 어느 것과도 맞지 않는 주소다. */}
-                <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-        </>
+
+                        {/* ================================
+                            Dashboard
+                        ================================= */}
+                        <Route
+                            path="/dashboard"
+                            element={<Dashboard />}
+                        />
+
+
+                        {/* ================================
+                            API Test
+                        ================================= */}
+                        <Route
+                            path="/api-test"
+                            element={<ApiTest />}
+                        />
+
+
+                        {/* ================================
+                            User
+                        ================================= */}
+                        <Route
+                            path="/signup"
+                            element={<SignUp />}
+                        />
+
+                        <Route
+                            path="/login"
+                            element={<Login />}
+                        />
+
+
+                        {/* ================================
+                            Analysis Create
+                        ================================= */}
+                        <Route
+                            path="/analysis/new"
+                            element={<AnalysisCreate />}
+                        />
+
+
+                        {/* ================================
+                            Analysis List
+                        ================================= */}
+                        <Route
+                            path="/analysis/list"
+                            element={<AnalysisList />}
+                        />
+
+
+                        {/* ================================
+                            Analysis Loading
+                        ================================= */}
+                        <Route
+                            path="/analysis/:id/loading"
+                            element={<AnalysisLoading />}
+                        />
+
+
+                        {/* ================================
+                            Analysis Workspace
+                            
+                            왼쪽 : 파일 목록
+                            중앙 : 선택한 파일 코드
+                            오른쪽 : 분석 결과
+                        ================================= */}
+                        <Route
+                            path="/analysis/:id"
+                            element={<AnalysisLayout />}
+                        />
+
+
+                        {/* ================================
+                            Analysis Detail
+                            
+                            기존 전체 분석 상세 페이지
+                        ================================= */}
+                        <Route
+                            path="/analysis/:id/detail"
+                            element={<AnalysisDetail />}
+                        />
+
+
+                        {/* ================================
+                            Finding List
+                        ================================= */}
+                        <Route
+                            path="/analysis/:analysisId/findings"
+                            element={<FindingList />}
+                        />
+
+
+                        {/* ================================
+                            Finding Detail
+                        ================================= */}
+                        <Route
+                            path="/findings/:findingId"
+                            element={<FindingDetail />}
+                        />
+
+
+                        {/* ================================
+                            Analysis File List
+                        ================================= */}
+                        <Route
+                            path="/analysis/:analysisId/files"
+                            element={<AnalysisFileList />}
+                        />
+
+
+                        {/* ================================
+                            Analysis File Detail
+                        ================================= */}
+                        <Route
+                            path="/analysis/:analysisId/files/:fileId"
+                            element={<AnalysisFileDetail />}
+                        />
+
+                    </Routes>
+
+                </main>
+
+            </div>
+
+        </Router>
     );
 }
+
+
+const styles = {
+    app: {
+        display: 'flex',
+        minHeight: '100vh',
+    },
+
+    main: {
+        flex: 1,
+        padding: '10px',
+        backgroundColor: '#f1f5f9',
+        overflowY: 'auto',
+        boxSizing: 'border-box',
+    },
+};
+
 
 export default App;
