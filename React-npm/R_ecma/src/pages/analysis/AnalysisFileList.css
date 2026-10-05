@@ -1,0 +1,158 @@
+.analysis-file-list {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.analysis-file-list__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.analysis-file-list__breadcrumb {
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.analysis-file-list__header h1 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 26px;
+}
+
+.analysis-file-list__header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.analysis-file-list__back {
+    padding: 10px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    cursor: pointer;
+}
+
+.analysis-file-list__back:hover {
+    background: #f8fafc;
+}
+
+.analysis-file-list__card {
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+}
+
+.analysis-file-list__card-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.analysis-file-list__card-header > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analysis-file-list__card-header strong {
+    color: #0f172a;
+    font-size: 15px;
+}
+
+.analysis-file-list__card-header span {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 12px;
+}
+
+.analysis-file-list__tree {
+    padding: 12px 0;
+}
+
+.analysis-file-list__folder-name {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    gap: 8px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.analysis-file-list__file {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 48px;
+    padding-top: 6px;
+    padding-right: 16px;
+    padding-bottom: 6px;
+    border: 0;
+    background: transparent;
+    color: #334155;
+    text-align: left;
+    cursor: pointer;
+}
+
+.analysis-file-list__file:hover {
+    background: #f1f5f9;
+}
+
+.analysis-file-list__icon {
+    width: 22px;
+    flex-shrink: 0;
+}
+
+.analysis-file-list__file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.analysis-file-list__file-name {
+    overflow: hidden;
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.analysis-file-list__file-meta {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.analysis-file-list__finding-count {
+    min-width: 20px;
+    margin-left: auto;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.analysis-file-list__loading,
+.analysis-file-list__empty,
+.analysis-file-list__error {
+    padding: 60px 20px;
+    color: #64748b;
+    text-align: center;
+}
+
+.analysis-file-list__error {
+    color: #dc2626;
+}

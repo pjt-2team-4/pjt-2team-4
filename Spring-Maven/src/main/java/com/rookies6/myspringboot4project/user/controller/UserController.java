@@ -1,71 +1,36 @@
 package com.rookies6.myspringboot4project.user.controller;
-
-import com.rookies6.myspringboot4project.user.dto.UserDTO;
-import com.rookies6.myspringboot4project.user.service.UserService;
-
+import com.rookies6.myspringboot4project.user.dto.LoginDTO;
+import com.rookies6.myspringboot4project.user.dto.SignupDTO;
+import com.rookies6.myspringboot4project.user.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class UserController {
+    private static final String BEARER_PREFIX = "Bearer ";
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    // 1. 전체 유저 조회
-    @GetMapping
-    public ResponseEntity<List<UserDTO.Response>> getAllUsers() {
-        List<UserDTO.Response> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
+    @PostMapping("/signup")
+    public ResponseEntity<SignupDTO.Response> signup(
+            @Valid @RequestBody SignupDTO.Request request) {
 
-    // 2. ID로 유저 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO.Response> getUserById(
-            @PathVariable Long id) {
-
-        UserDTO.Response user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
-    }
-
-    // 3. 이메일로 유저 조회 (기존 학번 검색 대체)
-    @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO.Response> getUserByEmail(
-            @PathVariable String email) {
-
-        UserDTO.Response user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(user);
-    }
-
-    // 4. 유저 생성 (회원가입)
-    @PostMapping
-    public ResponseEntity<UserDTO.Response> createUser(
-            @Valid @RequestBody UserDTO.Request request) {
-
-        UserDTO.Response createdUser = userService.createUser(request);
+        SignupDTO.Response createdUser = authService.signup(request);
         return ResponseEntity.ok(createdUser);
     }
 
-    // 5. 유저 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDTO.Response> updateUser(
-            @PathVariable Long id,
-            @Valid @RequestBody UserDTO.Request request) {
+    @PostMapping("/login")
+    public ResponseEntity<LoginDTO.Response> login(
+            @Valid @RequestBody LoginDTO.Request request) {
 
-        UserDTO.Response updatedUser = userService.updateUser(id, request);
-        return ResponseEntity.ok(updatedUser);
-    }
-
-    // 6. 유저 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-
-        userService.deleteUser(id);
-        return ResponseEntity.ok().build();
+        LoginDTO.Response response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

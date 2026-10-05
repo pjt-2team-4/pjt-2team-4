@@ -1,6 +1,7 @@
 package com.rookies6.myspringboot4project.sec.scanner.rule;
 
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
+
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 
@@ -43,7 +44,7 @@ public final class RuleCatalog {
 
             new SecurityRule("SQLI-002", VulnerabilityType.SQL_INJECTION, Severity.CRITICAL,
                     Set.of(Language.JAVA),
-                    "(?i)\\bStatement\\b.*\\.executeQuery\\s*\\(\\s*[a-zA-Z_$][\\w$]*\\s*\\)",
+                    "(?i)\\b([a-zA-Z_$][\\w$]*)\\s*\\.\\s*executeQuery\\s*\\(\\s*[a-zA-Z_$][\\w$]*\\s*\\)",
                     SQL_EXCLUDES,
                     "Statement에 조립된 쿼리 실행",
                     "PreparedStatement 없이 변수로 조립한 SQL을 그대로 실행하고 있습니다."),
@@ -146,3 +147,4 @@ public final class RuleCatalog {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 룰: " + ruleId));
     }
 }
+

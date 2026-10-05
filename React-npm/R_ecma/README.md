@@ -1,16 +1,20 @@
-# React + Vite
+# CodeGuard AI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+백엔드가 준비되기 전 UI/UX를 먼저 구현하기 위한 React + Vite 목업입니다. 현재 데이터는 `src/data/mockData.js`의 임시 데이터이며, 이후 Spring Boot REST API 응답으로 교체할 수 있습니다.
 
-Currently, two official plugins are available:
+## 실행
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+VS Code 터미널에 표시되는 `http://localhost:5173` 주소를 브라우저에서 엽니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 화면
+- 홈: 보안 워크스페이스 대시보드
+- 코드 분석: 파일 트리, 코드 에디터, 분석 설정, 진행 로그
+- 분석 결과: 취약점 필터, 탐지 코드, 설명, Before/After 수정안
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 백엔드 연동 시
+`src/data/mockData.js` 대신 `src/api/` 폴더를 만들고 Spring Boot API를 `fetch` 또는 Axios로 호출하면 됩니다. 화면 컴포넌트 구조는 그대로 사용할 수 있습니다.

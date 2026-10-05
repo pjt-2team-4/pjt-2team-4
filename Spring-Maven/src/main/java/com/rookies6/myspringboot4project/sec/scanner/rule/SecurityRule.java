@@ -1,7 +1,9 @@
 package com.rookies6.myspringboot4project.sec.scanner.rule;
 
 import com.rookies6.myspringboot4project.sec.common.enums.Language;
+
 import com.rookies6.myspringboot4project.sec.common.enums.Severity;
+
 import com.rookies6.myspringboot4project.sec.common.enums.VulnerabilityType;
 import lombok.Getter;
 
@@ -58,3 +60,4 @@ public class SecurityRule {
         return excludePatterns.stream().anyMatch(p -> p.matcher(line).find());
     }
 }
+

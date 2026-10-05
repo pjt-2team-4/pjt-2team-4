@@ -1,0 +1,102 @@
+.analysis-file-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.analysis-file-detail__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.analysis-file-detail__breadcrumb {
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.analysis-file-detail__header h1 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 24px;
+}
+
+.analysis-file-detail__header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.analysis-file-detail__header button {
+    padding: 10px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.analysis-file-detail__card {
+    overflow: hidden;
+    background: #0f172a;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.15);
+}
+
+.analysis-file-detail__toolbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.analysis-file-detail__code {
+    overflow-x: auto;
+    padding: 12px 0;
+}
+
+.analysis-file-detail__line {
+    position: relative;
+    display: flex;
+    min-height: 24px;
+    padding-right: 20px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 24px;
+    color: #e2e8f0;
+}
+
+.analysis-file-detail__line:hover {
+    background: #1e293b;
+}
+
+.analysis-file-detail__line--finding {
+    background: rgba(239, 68, 68, 0.12);
+    border-left: 3px solid #ef4444;
+}
+
+.analysis-file-detail__line-number {
+    width: 55px;
+    flex-shrink: 0;
+    padding-right: 15px;
+    text-align: right;
+    color: #64748b;
+    user-select: none;
+}
+
+.analysis-file-detail__line code {
+    white-space: pre;
+}
+
+.analysis-file-detail__marker {
+    margin-left: 20px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: #7f1d1d;
+    color: #fecaca;
+    font-family: inherit;
+    font-size: 11px;
+}

@@ -1,20 +1,16 @@
 package com.rookies6.myspringboot4project.exception;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +23,7 @@ public class DefaultExceptionAdvice {
         ErrorCode errorCode = ex.getErrorCode();
         ErrorObject errorObject = new ErrorObject();
         errorObject.setStatusCode(errorCode.getHttpStatus().value());
+        errorObject.setErrorCode(errorCode.name());
         errorObject.setMessage(ex.getMessage());
 
         log.error("{} : {}", errorCode.name(), errorCode.getMessage(), ex);
@@ -63,6 +60,7 @@ public class DefaultExceptionAdvice {
     protected ResponseEntity<ErrorObject> handleException(RuntimeException e) {
         ErrorObject errorObject = new ErrorObject();
         errorObject.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorObject.setErrorCode(ErrorCode.INTERNAL_SERVER_ERROR.name());
         errorObject.setMessage(e.getMessage());
 
         log.error(e.getMessage(), e);
@@ -70,41 +68,35 @@ public class DefaultExceptionAdvice {
         return new ResponseEntity<ErrorObject>(errorObject, HttpStatusCode.valueOf(500));
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ErrorObject> handleInvalidQueryParameter(MethodArgumentTypeMismatchException e) {
+        ErrorObject errorObject = new ErrorObject();
+        errorObject.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        errorObject.setErrorCode(ErrorCode.INVALID_INPUT.name());
+        errorObject.setMessage("올바르지 않은 요청 파라미터입니다: " + e.getName());
+        return ResponseEntity.badRequest().body(errorObject);
+    }
+
     //입력항목 검증할때 오류 발생할때 동작하는 메서드
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(
+    public ResponseEntity<ErrorObject> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
 
         log.error(ex.getMessage(), ex);
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult()
-                .getAllErrors()
+                .getFieldErrors()
                 .forEach((error) -> {
-                    String fieldName = ((FieldError) error).getField();
-                    String errorMessage = error.getDefaultMessage();
-                    errors.put(fieldName, errorMessage);
+                    errors.put(error.getField(), error.getDefaultMessage());
                 });
 
-        ValidationErrorResponse response =
-                new ValidationErrorResponse(
-                400,
-                "입력항목 검증 오류",
-                LocalDateTime.now(),
-                errors
-        );
-        //badRequest() 400
+        ErrorObject response = new ErrorObject();
+        response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        response.setErrorCode(ErrorCode.VALIDATION_ERROR.name());
+        response.setMessage(ErrorCode.VALIDATION_ERROR.getMessage());
+        response.setFieldErrors(errors);
         return ResponseEntity.badRequest().body(response);
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class ValidationErrorResponse {
-        private int status;
-        private String message;
-        private LocalDateTime timestamp;
-        private Map<String, String> errors;
     }
 
 }
